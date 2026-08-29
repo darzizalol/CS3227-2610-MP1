@@ -63,3 +63,15 @@ layout.
 - Run manual interaction tests on Windows and Linux.
 - Student must review this summary and correct any inaccurate statements before
   submission.
+
+## Git workflow follow-up
+
+- Replaced the single MVP implementation commit with focused commits for build
+  tooling, the domain model, persistence, command handling, JavaFX UI, release
+  automation, documentation, and repository conventions.
+- Renamed the primary branch from `main` to `master` and the active development
+  branch from `codex/focus-farm-mvp` to `feat-focus-farm-mvp`.
+- Adopted `<purpose>-<short-kebab-case-name>` for working branches and recorded
+  the convention in `AGENTS.md` and Codex project-memory context.
+- Preserved the former MVP commit under a local backup tag so the history rewrite
+  is recoverable until the new history has been reviewed.
