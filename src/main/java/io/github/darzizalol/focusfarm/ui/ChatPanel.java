@@ -17,7 +17,11 @@ public final class ChatPanel extends VBox {
     private final TextArea transcript;
     private final TextField commandField;
 
-    /** Creates a chat panel that sends submitted commands to the callback. */
+    /**
+     * Creates a chat panel that sends submitted commands to a callback.
+     *
+     * @param commandHandler recipient of non-blank commands
+     */
     public ChatPanel(Consumer<String> commandHandler) {
         Objects.requireNonNull(commandHandler);
         getStyleClass().add("chat-panel");
@@ -59,17 +63,29 @@ public final class ChatPanel extends VBox {
         getChildren().addAll(title, hint, transcript, inputRow);
     }
 
-    /** Appends a command entered by the user. */
+    /**
+     * Appends a command entered by the user.
+     *
+     * @param message command text
+     */
     public void appendUser(String message) {
         append("YOU", message);
     }
 
-    /** Appends a normal response from Focus Farm. */
+    /**
+     * Appends a normal response from Focus Farm.
+     *
+     * @param message response text
+     */
     public void appendFarm(String message) {
         append("FARM", message);
     }
 
-    /** Appends a highlighted error response. */
+    /**
+     * Appends a highlighted error response.
+     *
+     * @param message error text
+     */
     public void appendError(String message) {
         append("ERROR", message);
     }

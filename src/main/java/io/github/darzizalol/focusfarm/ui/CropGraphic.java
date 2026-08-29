@@ -22,7 +22,11 @@ public final class CropGraphic extends Pane {
         setMaxSize(WIDTH, HEIGHT);
     }
 
-    /** Redraws the crop for the supplied plot state. */
+    /**
+     * Redraws the crop for the supplied plot state.
+     *
+     * @param plot plot state to render
+     */
     public void update(PlotSnapshot plot) {
         getChildren().clear();
         if (plot.state() == PlotState.EMPTY) {

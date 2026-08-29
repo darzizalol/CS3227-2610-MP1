@@ -18,7 +18,11 @@ public final class PlotView extends VBox {
     private final CropGraphic cropGraphic;
     private PlotState displayedState;
 
-    /** Creates a plot card with a stable plot number. */
+    /**
+     * Creates a plot card with a stable plot number.
+     *
+     * @param plotId one-based plot identifier
+     */
     public PlotView(int plotId) {
         getStyleClass().add("plot-card");
         setAlignment(Pos.CENTER);
@@ -41,7 +45,11 @@ public final class PlotView extends VBox {
         getChildren().addAll(plotLabel, cropLabel, soil, statusLabel);
     }
 
-    /** Refreshes labels and crop stage from immutable model state. */
+    /**
+     * Refreshes labels and crop stage from immutable model state.
+     *
+     * @param plot plot state to display
+     */
     public void update(PlotSnapshot plot) {
         displayedState = plot.state();
         cropLabel.setText(plot.crop() == null ? "EMPTY" : plot.crop().displayName().toUpperCase());
@@ -51,7 +59,11 @@ public final class PlotView extends VBox {
         getStyleClass().add("plot-" + plot.state().name().toLowerCase());
     }
 
-    /** Plays a short cosmetic pulse after a successful plot command. */
+    /**
+     * Plays a short cosmetic pulse after a successful plot command.
+     *
+     * @param event event that controls pulse emphasis
+     */
     public void animate(FarmEvent event) {
         double peak = event == FarmEvent.FERTILIZED ? 1.12 : 1.06;
         ScaleTransition pulse = new ScaleTransition(Duration.millis(180), this);

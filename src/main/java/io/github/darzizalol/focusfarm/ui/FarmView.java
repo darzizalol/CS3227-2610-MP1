@@ -53,14 +53,23 @@ public final class FarmView extends VBox {
         getChildren().addAll(fieldSign, grid);
     }
 
-    /** Refreshes all six plots. */
+    /**
+     * Refreshes all six plots.
+     *
+     * @param snapshot farm state to display
+     */
     public void update(FarmSnapshot snapshot) {
         for (PlotSnapshot plot : snapshot.plots()) {
             plotViews.get(plot.id()).update(plot);
         }
     }
 
-    /** Plays a plot animation for a successful state-changing command. */
+    /**
+     * Plays a plot animation for a successful state-changing command.
+     *
+     * @param event animation category
+     * @param plotId affected plot, or {@code null} for a farm-wide event
+     */
     public void animate(FarmEvent event, Integer plotId) {
         if (plotId != null && plotViews.containsKey(plotId)) {
             plotViews.get(plotId).animate(event);

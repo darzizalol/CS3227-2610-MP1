@@ -17,6 +17,10 @@ public final class FocusFarmApp extends Application {
     private LogicManager logic;
     private MainWindow mainWindow;
 
+    /** Creates the JavaFX application. */
+    public FocusFarmApp() {
+    }
+
     @Override
     public void init() {
         JsonFarmStorage storage = new JsonFarmStorage(Path.of("data", "farm.json"));
