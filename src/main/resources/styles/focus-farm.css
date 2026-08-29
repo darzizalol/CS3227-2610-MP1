@@ -1,0 +1,162 @@
+.root {
+    -fx-font-family: "Menlo", "Consolas", monospace;
+    -fx-font-size: 13px;
+    -fx-background-color: #173c2a;
+}
+
+.main-split > .split-pane-divider {
+    -fx-background-color: #10281d;
+    -fx-padding: 0 3 0 3;
+}
+
+.farm-side {
+    -fx-background-color: #84c85a;
+}
+
+.title-block {
+    -fx-background-color: #173c2a;
+    -fx-border-color: #0d2118;
+    -fx-border-width: 0 0 5 0;
+}
+
+.app-title {
+    -fx-text-fill: #fff3bd;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.app-subtitle {
+    -fx-text-fill: #b9d9b0;
+}
+
+.farm-view {
+    -fx-background-color: linear-gradient(to bottom, #78c95d 0%, #9ed766 48%, #72bd50 49%, #6bb34a 100%);
+    -fx-border-color: #4d8f3a;
+    -fx-border-width: 0 0 5 0;
+}
+
+.field-sign {
+    -fx-background-color: #8b5a2b;
+    -fx-text-fill: #fff0b3;
+    -fx-font-weight: bold;
+    -fx-padding: 7 16 7 16;
+    -fx-border-color: #513218;
+    -fx-border-width: 3;
+}
+
+.plot-card {
+    -fx-background-color: rgba(247, 226, 154, 0.78);
+    -fx-border-color: #4d6f35;
+    -fx-border-width: 4;
+    -fx-padding: 8;
+    -fx-min-height: 175;
+}
+
+.plot-ready {
+    -fx-border-color: #fff36a;
+    -fx-effect: dropshadow(gaussian, rgba(255, 243, 106, 0.85), 16, 0.45, 0, 0);
+}
+
+.plot-number {
+    -fx-text-fill: #3a4d2e;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.crop-name {
+    -fx-text-fill: #183b2a;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.soil-bed {
+    -fx-background-color: #7b4b28;
+    -fx-border-color: #4b2d19;
+    -fx-border-width: 4 4 7 4;
+    -fx-background-insets: 5 3 2 3;
+}
+
+.plot-status {
+    -fx-text-fill: #2c4224;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.dashboard {
+    -fx-background-color: #f6e3a7;
+    -fx-border-color: #5e3f24;
+    -fx-border-width: 0 0 0 0;
+    -fx-padding: 12 20 14 20;
+}
+
+.dashboard-title {
+    -fx-text-fill: #173c2a;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.dashboard-totals,
+.recent-harvest {
+    -fx-text-fill: #5b4828;
+    -fx-font-size: 11px;
+}
+
+.inventory-chip {
+    -fx-background-color: #fff6d5;
+    -fx-text-fill: #28472f;
+    -fx-border-color: #b69150;
+    -fx-border-width: 2;
+    -fx-padding: 5 9 5 9;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.chat-panel {
+    -fx-background-color: #10281d;
+    -fx-border-color: #091a12;
+    -fx-border-width: 0 0 0 2;
+}
+
+.panel-title {
+    -fx-text-fill: #8de07a;
+    -fx-font-size: 19px;
+    -fx-font-weight: bold;
+}
+
+.panel-hint {
+    -fx-text-fill: #7da18b;
+    -fx-font-size: 11px;
+}
+
+.chat-transcript {
+    -fx-control-inner-background: #0b1f16;
+    -fx-text-fill: #d8f0c9;
+    -fx-highlight-fill: #386b4c;
+    -fx-highlight-text-fill: white;
+    -fx-border-color: #31563e;
+    -fx-border-width: 2;
+    -fx-font-family: "Menlo", "Consolas", monospace;
+    -fx-font-size: 12px;
+}
+
+.command-field {
+    -fx-background-color: #f6efcf;
+    -fx-text-fill: #173c2a;
+    -fx-prompt-text-fill: #6f806e;
+    -fx-border-color: #5f8f6b;
+    -fx-border-width: 3;
+    -fx-padding: 9;
+}
+
+.send-button {
+    -fx-background-color: #69b94f;
+    -fx-text-fill: #10281d;
+    -fx-font-weight: bold;
+    -fx-border-color: #a6e56f;
+    -fx-border-width: 3;
+    -fx-padding: 8 13 8 13;
+}
+
+.send-button:hover {
+    -fx-background-color: #83d35f;
+}
