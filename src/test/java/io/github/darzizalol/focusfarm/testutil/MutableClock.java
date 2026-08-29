@@ -12,7 +12,11 @@ public final class MutableClock extends Clock {
     private Instant instant;
     private final ZoneId zone;
 
-    /** Creates a UTC clock at the supplied instant. */
+    /**
+     * Creates a UTC clock at the supplied instant.
+     *
+     * @param instant initial time
+     */
     public MutableClock(Instant instant) {
         this(instant, ZoneOffset.UTC);
     }
@@ -22,7 +26,11 @@ public final class MutableClock extends Clock {
         this.zone = Objects.requireNonNull(zone);
     }
 
-    /** Advances the clock by a positive or negative duration. */
+    /**
+     * Advances the clock by a positive or negative duration.
+     *
+     * @param duration amount to add
+     */
     public void advance(Duration duration) {
         instant = instant.plus(duration);
     }
