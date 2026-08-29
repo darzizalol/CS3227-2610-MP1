@@ -1,34 +1,24 @@
 # Focus Farm User Guide
 
-Focus Farm is a Java desktop countdown timer and harvest tracker. It turns six
-independent timers into a small pixel-inspired farm: plant a crop, water it to
-start its timer, optionally fertilize it once, and harvest it when it matures.
+Focus Farm is a desktop countdown timer and harvest tracker presented as a
+small farm. Each of its six plots is an independent timer: plant a crop, water
+it to begin the countdown, optionally fertilize it once, and harvest it when it
+is ready.
 
-## Requirements
+## Quick start
 
-- Java SE 25
+### Requirements
+
+- Java 25
 - Windows, Linux, or macOS
-- A screen resolution of at least 980 × 650
+- A display resolution of at least 980 × 650
 
-## Starting Focus Farm
+The packaged JAR contains JavaFX native libraries for one platform. Use a JAR
+built for your operating system and CPU architecture. The JAR checked into this
+repository is built for macOS on Apple Silicon; the project's CI produces
+separate Windows, Linux, and macOS artifacts.
 
-### From the project folder
-
-macOS users with the Homebrew `openjdk@25` formula can run:
-
-```bash
-JAVA_HOME=/opt/homebrew/opt/openjdk@25/libexec/openjdk.jdk/Contents/Home ./gradlew run
-```
-
-On any operating system where Java 25 is already the active JDK:
-
-```bash
-./gradlew run
-```
-
-Windows users should use `gradlew.bat run`.
-
-### From the packaged JAR
+### Run the packaged application
 
 From the repository root:
 
@@ -36,112 +26,209 @@ From the repository root:
 java -jar release/FocusFarm.jar
 ```
 
-On this project's macOS development machine, Java 25 is installed side-by-side,
-so use the explicit executable:
+If the command reports a Java version error, run `java -version` and confirm
+that Java 25 is active.
+
+### Run from source
+
+From the repository root on macOS or Linux:
 
 ```bash
-/opt/homebrew/opt/openjdk@25/bin/java -jar release/FocusFarm.jar
+./gradlew run
 ```
 
-JavaFX uses native libraries. The checked-in MVP JAR is built for macOS Apple
-Silicon. The CI workflow builds separate JAR artifacts for Windows, Linux, and
-macOS; use the artifact built for your operating system and CPU architecture.
+On Windows:
 
-If Focus Farm temporarily cannot save a crop transition, it reports the error
-once and retries automatically on subsequent countdown ticks. Countdown and
-dashboard updates resume after saving recovers.
+```bat
+gradlew.bat run
+```
 
-## Interface
+The Gradle wrapper downloads the required build dependencies automatically.
 
-- The left side contains the six farm plots and harvest dashboard.
-- The right side contains the farm terminal and command input.
-- Each plot shows its crop, lifecycle state, and countdown.
-- The dashboard shows inventory counts, total harvests, growing plots, ready
-  plots, and the most recent harvest.
+## Interface tour
 
-## Commands
+![Focus Farm showing planted, growing, ready, and empty plots](images/focus-farm-overview.png)
 
-All commands begin with `/`. Commands and crop names are case-insensitive.
-Extra spaces between words are accepted.
+1. **Farm plots** show the crop and its current state. A growing crop also
+   displays its remaining time.
+2. **Harvest dashboard** shows each crop's inventory count, total harvests,
+   number of growing and ready plots, and the most recent harvest.
+3. **Farm terminal** records commands, responses, and errors.
+4. **Command box** accepts a slash command. Press Enter or select **SEND** to
+   submit it.
 
-### Plant a crop
+All state changes are made through the command box. The plot graphics and
+animations provide feedback but are not clickable controls.
+
+## Two-minute test
+
+Use this walkthrough to test the complete crop lifecycle:
+
+1. Plant a ten-second carrot timer in plot 1:
+
+   ```text
+   /plant 1 carrot 10s
+   ```
+
+2. Start its countdown:
+
+   ```text
+   /water 1
+   ```
+
+3. While it is growing, shorten its current remaining time by 25%:
+
+   ```text
+   /fertilize 1
+   ```
+
+4. Wait until plot 1 displays `READY TO HARVEST`, then enter:
+
+   ```text
+   /harvest 1
+   ```
+
+5. Confirm that the carrot inventory and total harvest count increased, then
+   inspect all plots:
+
+   ```text
+   /status
+   ```
+
+6. Save and close Focus Farm:
+
+   ```text
+   /exit
+   ```
+
+7. Start Focus Farm again from the same folder. The carrot inventory should
+   still contain the harvest.
+
+## Command reference
+
+Every command begins with `/`. Command words, crop names, and duration suffixes
+are case-insensitive. Extra spaces between words are accepted.
+
+| Command | What it does | When it succeeds |
+| --- | --- | --- |
+| `/plant <plot> <crop> <duration>` | Places a crop and configures its timer | The selected plot is empty and the inputs are valid |
+| `/water <plot>` | Starts the configured timer | The crop is planted but has not been watered |
+| `/fertilize <plot>` | Removes 25% of the current remaining time | The crop is growing and has not been fertilized |
+| `/harvest <plot>` | Adds a mature crop to the inventory and empties the plot | The plot displays `READY TO HARVEST` |
+| `/status` | Prints the state of all six plots | Always |
+| `/help` | Prints the command summary | Always |
+| `/exit` | Saves the farm and closes the application | The save succeeds |
+
+![The in-app help output in the farm terminal](images/focus-farm-help.png)
+
+### Plant
 
 ```text
 /plant <plot> <crop> <duration>
 ```
 
+- `<plot>` must be a number from `1` to `6`.
+- `<crop>` must be `carrot`, `tomato`, `corn`, `strawberry`,
+  `pumpkin`, or `cabbage`.
+- `<duration>` must be from 10 seconds to 60 minutes, inclusive.
+- Use `s` for seconds or `m` for minutes, for example `30s` or `5m`.
+- Planting stores the duration but does not start the countdown.
+
 Example:
 
 ```text
-/plant 2 carrot 10s
+/plant 2 tomato 5m
 ```
 
-- Plot must be from `1` to `6`.
-- Crop must be `carrot`, `tomato`, `corn`, `strawberry`, `pumpkin`, or
-  `cabbage`.
-- Duration must be between 10 seconds and 60 minutes.
-- Use `s` for seconds or `m` for minutes, such as `30s` or `5m`.
-- Planting does not begin the timer. The plot must be watered next.
-
-### Water a planted crop
+### Water
 
 ```text
 /water <plot>
 ```
 
-Watering begins the configured countdown. A crop can only be watered once.
+Watering a planted crop starts its countdown. Each crop can be watered only
+once.
 
-### Fertilize a growing crop
+### Fertilize
 
 ```text
 /fertilize <plot>
 ```
 
-Fertilizer reduces the crop's current remaining time by 25%. It can be applied
-only once per crop and only while the crop is actively growing.
+Fertilizer can be used once per crop while it is growing. It removes 25% of
+the remaining time at the moment the command is accepted; it does not remove
+25% of the original duration.
 
-### Harvest a mature crop
+### Harvest
 
 ```text
 /harvest <plot>
 ```
 
-Harvesting is allowed only when the plot says `READY TO HARVEST`. The harvested
-crop is added to the dashboard inventory and the plot becomes empty.
+A crop can be harvested only after its plot displays `READY TO HARVEST`.
+Harvesting increments that crop's inventory count, records it as the most
+recent harvest, and resets the plot to empty.
 
-### View text status
+### Status, help, and exit
 
 ```text
 /status
-```
-
-This prints the crop and state of every plot in the terminal.
-
-### View help or exit
-
-```text
 /help
 /exit
 ```
 
-`/exit` saves the farm before closing the window. If that save fails, Focus Farm
-reports the error and remains open so you can correct the storage problem and
-retry `/exit` without losing recent progress.
+`/status` lists every plot in the terminal. `/help` shows the in-app command
+summary. `/exit` confirms that the current farm was saved before closing.
 
-## Persistence
+## Saving and recovery
 
-Farm data is saved automatically to `data/farm.json`, relative to the folder
-from which the application was started. Growth is based on absolute timestamps,
-so watered crops continue to grow while Focus Farm is closed.
+Focus Farm saves successful state-changing commands automatically. It also
+saves a time-driven transition when a growing crop becomes ready. Farm data is
+stored in `data/farm.json` relative to the folder from which Focus Farm was
+started.
 
-If saved JSON is unreadable, Focus Farm moves it to a timestamped
-`farm.json.corrupt-*` backup and starts an empty farm rather than silently
-overwriting the damaged file.
+Watered crops use absolute readiness timestamps, so they continue to grow while
+the application is closed.
 
-## MVP limitations
+Use `/exit` when possible. Closing the window also attempts to save, but
+`/exit` can display a save error and keep the application open for another
+attempt.
 
-- There are exactly six plots.
-- Fertilizer is unlimited but can be applied only once to each planted crop.
-- There is no currency, shop, weather, farmer movement, sound, or direct mouse
-  interaction with plots.
-- The terminal is the only way to change farm state.
+If a command cannot be saved, the command is rejected and the visible farm
+remains unchanged. If a crop becomes ready while saving is unavailable, Focus
+Farm reports the first error, keeps retrying once per countdown tick, and
+announces when saving recovers.
+
+If `data/farm.json` is unreadable or uses an unsupported schema, Focus Farm
+tries to move it to a timestamped `farm.json.corrupt-*` backup, reports what
+happened in the terminal, and starts with an empty farm. If the backup cannot
+be created, the terminal says so.
+
+## Troubleshooting
+
+### The application does not start
+
+1. Run `java -version` and check that it reports Java 25.
+2. Confirm that the JAR matches your operating system and CPU architecture.
+3. If using the source checkout, run the platform-appropriate Gradle command
+   from the repository root.
+
+### A command is rejected
+
+Read the `[ERROR]` entry in the terminal. Invalid commands do not partially
+change the farm. Use `/help` to confirm the syntax and `/status` to inspect the
+current plot states.
+
+### Start a separate test farm
+
+Farm data belongs to the folder from which the application is started. To
+avoid changing an existing farm, copy the correct platform JAR into a new empty
+folder and run it there. That folder receives its own `data/farm.json`.
+
+## Current limitations
+
+- The farm always contains exactly six plots.
+- Fertilizer is unlimited, but each planted crop can receive it only once.
+- There is no currency, shop, weather, farmer movement, sound, or network
+  feature.
+- Plots cannot be changed directly with the mouse; commands are the only input.

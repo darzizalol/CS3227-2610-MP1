@@ -17,4 +17,4 @@ This project is developed individually for NUS CS3227 MP1 using Java SE 25.
 ```
 
 See [docs/UserGuide.md](docs/UserGuide.md) for user instructions.
-See [docs/DeveloperGuide.md](docs/DeveloperGuide.md) for Developer instructions.
+See [docs/DeveloperGuide.md](docs/DeveloperGuide.md) for developer documentation.
