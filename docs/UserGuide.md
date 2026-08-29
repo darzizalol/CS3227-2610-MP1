@@ -47,6 +47,10 @@ JavaFX uses native libraries. The checked-in MVP JAR is built for macOS Apple
 Silicon. The CI workflow builds separate JAR artifacts for Windows, Linux, and
 macOS; use the artifact built for your operating system and CPU architecture.
 
+If Focus Farm temporarily cannot save a crop transition, it reports the error
+once and retries automatically on subsequent countdown ticks. Countdown and
+dashboard updates resume after saving recovers.
+
 ## Interface
 
 - The left side contains the six farm plots and harvest dashboard.

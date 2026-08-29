@@ -89,3 +89,13 @@ layout.
   candidate state.
 - Made snapshots observational rather than state-changing so UI reads cannot
   bypass the transactional refresh path.
+
+## Countdown retry follow-up
+
+- Confirmed that the JavaFX error handler stopped the only refresh timeline
+  after a crop-transition save failed, with no path to restart it.
+- Added a refresh coordinator that leaves the timeline running, retries failed
+  transitions each second, suppresses repeated outage messages, and announces
+  recovery after the first successful retry.
+- Added a behavioral test using a recoverable storage failure to verify the
+  retry, message suppression, successful UI refresh, and ready-state transition.

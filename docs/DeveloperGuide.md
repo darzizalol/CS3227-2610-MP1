@@ -37,6 +37,10 @@ FarmStorage ─ JsonFarmStorage
 the presentation refresh cycle. `FarmView` and `DashboardView` receive only
 immutable snapshots. UI animations are cosmetic and never change model state.
 
+`CountdownRefreshCoordinator` keeps the timeline independent of persistence
+failures. It retries on the next tick, reports a continuing outage only once,
+and announces when refreshes recover.
+
 The crop drawings use original JavaFX shapes. The MVP has no external image,
 font, music, or sound assets.
 
@@ -107,6 +111,8 @@ java -jar release/FocusFarm.jar
   backup creation, and parent-directory creation.
 - Logic tests inject save failures and verify that command and timer mutations
   are discarded until persistence succeeds.
+- UI coordination tests verify that failed timer saves are retried, duplicate
+  errors are suppressed, and the dashboard refreshes after recovery.
 - A manual GUI session checks the 70:30 layout, countdown refresh, animations,
   dashboard updates, resizing, restart, and the packaged JAR.
 

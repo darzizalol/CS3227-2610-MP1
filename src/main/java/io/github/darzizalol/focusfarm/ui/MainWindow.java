@@ -28,6 +28,7 @@ public final class MainWindow {
     private final FarmView farmView;
     private final DashboardView dashboardView;
     private final ChatPanel chatPanel;
+    private final CountdownRefreshCoordinator refreshCoordinator;
     private final Timeline refreshTimeline;
 
     /** Creates the complete 70:30 Focus Farm window. */
@@ -39,6 +40,8 @@ public final class MainWindow {
         farmView = new FarmView();
         dashboardView = new DashboardView();
         chatPanel = new ChatPanel(this::executeCommand);
+        refreshCoordinator = new CountdownRefreshCoordinator(logic, this::refreshFarm,
+                chatPanel::appendFarm, chatPanel::appendError);
 
         VBox farmSide = createFarmSide();
         SplitPane splitPane = new SplitPane(farmSide, chatPanel);
@@ -53,7 +56,7 @@ public final class MainWindow {
         stage.setMinWidth(980);
         stage.setMinHeight(650);
 
-        refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> refreshFromClock()));
+        refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> refreshCoordinator.refresh()));
         refreshTimeline.setCycleCount(Timeline.INDEFINITE);
         refreshFarm();
         chatPanel.appendFarm(logic.startupMessage());
@@ -101,16 +104,6 @@ public final class MainWindow {
             }
         } catch (FarmException exception) {
             chatPanel.appendError(exception.getMessage());
-        }
-    }
-
-    private void refreshFromClock() {
-        try {
-            logic.refreshGrowth();
-            refreshFarm();
-        } catch (FarmException exception) {
-            refreshTimeline.stop();
-            chatPanel.appendError(exception.getMessage() + " Countdown refresh has been stopped.");
         }
     }
 
