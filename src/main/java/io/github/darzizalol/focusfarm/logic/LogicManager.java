@@ -17,7 +17,12 @@ public final class LogicManager {
     private final String startupMessage;
     private Farm farm;
 
-    /** Loads an existing farm or starts a recoverable empty farm. */
+    /**
+     * Loads a saved farm or starts an empty farm after a recoverable load failure.
+     *
+     * @param storage persistence provider
+     * @param clock authoritative clock for crop timing
+     */
     public LogicManager(FarmStorage storage, Clock clock) {
         this.storage = Objects.requireNonNull(storage);
         parser = new CommandParser();
@@ -36,7 +41,13 @@ public final class LogicManager {
         startupMessage = message;
     }
 
-    /** Executes one command and persists successful state changes. */
+    /**
+     * Executes one command and persists successful state changes.
+     *
+     * @param input command text
+     * @return the command result
+     * @throws FarmException if parsing, execution, or persistence fails
+     */
     public CommandResult execute(String input) throws FarmException {
         FarmCommand command = parser.parse(input);
         Farm candidate = farm.copy();
@@ -49,7 +60,12 @@ public final class LogicManager {
         return result;
     }
 
-    /** Refreshes time-driven state and saves only when a crop becomes ready. */
+    /**
+     * Refreshes time-driven state and saves new ready crops.
+     *
+     * @return {@code true} if at least one crop became ready
+     * @throws FarmException if changed state cannot be saved
+     */
     public boolean refreshGrowth() throws FarmException {
         Farm candidate = farm.copy();
         boolean changed = candidate.refreshGrowth();
@@ -59,17 +75,29 @@ public final class LogicManager {
         return changed;
     }
 
-    /** Returns the current immutable farm view. */
+    /**
+     * Returns the current immutable farm view.
+     *
+     * @return the farm snapshot
+     */
     public FarmSnapshot snapshot() {
         return farm.snapshot();
     }
 
-    /** Returns the startup or recovery message for the chat panel. */
+    /**
+     * Returns the startup or recovery message.
+     *
+     * @return message for the chat panel
+     */
     public String startupMessage() {
         return startupMessage;
     }
 
-    /** Persists current state before application shutdown. */
+    /**
+     * Persists current state before shutdown.
+     *
+     * @throws FarmException if the farm cannot be saved
+     */
     public void close() throws FarmException {
         save(farm.snapshot());
     }

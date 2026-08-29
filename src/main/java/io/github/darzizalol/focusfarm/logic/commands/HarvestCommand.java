@@ -7,7 +7,11 @@ import io.github.darzizalol.focusfarm.model.Farm;
 import io.github.darzizalol.focusfarm.model.FarmException;
 import io.github.darzizalol.focusfarm.model.HarvestRecord;
 
-/** Harvests a ready plot and records its crop. */
+/**
+ * Harvests a ready plot and records its crop.
+ *
+ * @param plotId one-based plot identifier
+ */
 public record HarvestCommand(int plotId) implements FarmCommand {
     @Override
     public CommandResult execute(Farm farm) throws FarmException {

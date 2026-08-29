@@ -15,7 +15,17 @@ import io.github.darzizalol.focusfarm.model.FarmException;
 
 /** Converts chat-style slash commands into executable command objects. */
 public final class CommandParser {
-    /** Parses a complete user command. */
+    /** Creates a command parser. */
+    public CommandParser() {
+    }
+
+    /**
+     * Parses a complete user command.
+     *
+     * @param input command text
+     * @return the parsed command
+     * @throws FarmException if the syntax or arguments are invalid
+     */
     public FarmCommand parse(String input) throws FarmException {
         if (input == null || input.isBlank()) {
             throw new FarmException("Enter a command. Type /help to see the available commands.");

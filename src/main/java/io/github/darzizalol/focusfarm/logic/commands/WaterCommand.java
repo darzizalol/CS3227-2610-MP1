@@ -6,7 +6,11 @@ import io.github.darzizalol.focusfarm.logic.FarmEvent;
 import io.github.darzizalol.focusfarm.model.Farm;
 import io.github.darzizalol.focusfarm.model.FarmException;
 
-/** Waters a planted plot to start its growth timer. */
+/**
+ * Waters a planted plot to start its growth timer.
+ *
+ * @param plotId one-based plot identifier
+ */
 public record WaterCommand(int plotId) implements FarmCommand {
     @Override
     public CommandResult execute(Farm farm) throws FarmException {
