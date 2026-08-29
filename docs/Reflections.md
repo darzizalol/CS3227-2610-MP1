@@ -1,54 +1,35 @@
-# Reflections on AI-Assisted Software Engineering
+# Disclaimer
+This reflection was polished by an AI, but the core content, engineering decisions, and reflections are entirely my own (ZhengHao).
 
-This document records how I used prompting and AI tools while developing Focus
-Farm. I did not use the AI only to generate code. I also used it during
-planning, implementation, review, debugging, and documentation. The examples
-below focus on prompts that changed how I worked or exposed limitations in the
-AI-assisted process.
+# Reflections on AI-Assisted Software Engineering 
 
-## Example 1: Giving context and asking the AI to question me
+This document captures my workflow using prompting and AI tools while building Focus Farm for CS3227. I didn't just treat the AI as an overgrown autocomplete for code generation—I integrated it into the entire lifecycle: planning, implementation, code review, debugging, and writing docs. The examples below highlight prompts that actually shifted my workflow or exposed where AI-assisted dev falls short.
+
+## Example 1: Giving context and asking the AI to grill me
 
 ### How I prompted
 
-I started by giving the AI the CS3227 project description and my project idea.
-The important part of my prompt was that I did not immediately ask it to start
-coding. I asked it to question my requirements, clarify anything uncertain,
-check whether the idea was feasible, and avoid hallucinating.
+I started by giving the AI the CS3227 project description and my initial idea. The crux of my prompt was deliberately *not* asking it to write code right away. Instead, I told it to grill me on my requirements, clarify ambiguities, sanity-check the idea's feasibility, and strictly avoid hallucinating features.
 
-I formulated the prompt this way because my initial requirements were still
-rough. If I had only said “build this app”, the AI could have filled in missing
-details based on its own assumptions. Those assumptions might not match what I
-wanted or what the assignment required.
+I framed the prompt this way because my initial specs were pretty rough. If I had just said "build this app", the AI would have confidently filled in the blanks with its own assumptions—which might not have aligned with what I actually wanted or what the assignment rubric demanded.
 
 ### What I learnt
 
-Giving the assignment context helped keep the discussion within the actual
-project constraints. Asking for questions also made the planning phase more
-interactive. Instead of treating the first idea as final, I could review the
-AI's interpretation and decide whether I agreed with it.
+Establishing the assignment context kept the AI grounded in reality and project constraints. Asking for pushback also made the planning phase highly interactive. Instead of treating the first generated idea as gospel, I could review the AI's interpretation and decide if we were actually on the same page.
 
-The prompt gradually became more specific. I first supplied the context and
-idea, then reviewed the proposed technology stack, architecture, interface, and
-features. I only approved the build after I was satisfied with that plan. This
-gave me a clear checkpoint between discussion and implementation.
+My prompts gradually became more specific. I fed it context, reviewed the proposed tech stack, architecture, UI, and features, and only approved the build once I was satisfied with the blueprint. This gave me a strict, necessary checkpoint between ideation and execution.
 
 ### What I would do differently
 
-Next time, I would still ask the AI to challenge the requirements, but I would
-also list the decisions that must remain mine. This would make it clearer which
-parts the AI may propose and which parts it should leave open for confirmation.
+Next time, I would still ask the AI to challenge the requirements, but I would explicitly list my non-negotiables upfront. This establishes clear boundaries on which parts the AI can creatively propose and which parts it needs to leave alone.
 
 ## Example 2: Turning an idea into an implementation plan
 
 ### How I prompted
 
-After the discussion phase, I asked the AI to turn the approved idea into a
-structured plan. The plan covered the architecture, a 70:30 farm-and-chat
-interface, the six farm plots, the dashboard, commands, and JSON persistence.
-The architecture separated the application into UI, logic, model, and storage
-components.
+Once we locked in the idea, I prompted the AI to map out a structured implementation plan. The blueprint covered the architecture, a 70:30 farm-and-chat interface, the six farm plots, the dashboard, commands, and JSON persistence. The architecture cleanly decoupled the application into UI, logic, model, and storage components.
 
-I also wanted the work divided into phases:
+I also forced it to split the work into logical phases:
 
 1. Bootstrap the project.
 2. Build the domain foundation.
@@ -57,132 +38,72 @@ I also wanted the work divided into phases:
 5. Complete the farm and dashboard.
 6. Harden and package the release.
 
-The prompt included quality gates such as Checkstyle, strict compiler warnings,
-JUnit, JaCoCo coverage, cross-platform CI, and JAR generation.
+The prompt included strict quality gates: Checkstyle, strict compiler warnings, JUnit, JaCoCo coverage, cross-platform CI, and JAR generation.
 
 ### Assumptions and engineering judgement
 
-The AI assumed that the UI, command handling, model, and persistence should be
-separate. I agreed with this because it made the design easier to extend and
-kept JavaFX concerns away from the core farm logic. However, I still had to
-review whether the proposed structure matched the size of an individual school
-project. A design can look organised but still be unnecessarily complicated.
+The AI assumed the UI, command handling, model, and persistence should be isolated. I agreed—it’s standard SWE practice, makes the design extensible, and keeps JavaFX spaghetti out of the core farm logic. However, I still had to do a vibe check on whether the proposed structure actually matched the scope of an individual school project. A design can look beautifully organized on paper but still be massively over-engineered.
 
-The diagrams and phased plan were useful because they gave me something
-concrete to review before code was produced. I could check that the six plots,
-dashboard, chat panel, and required farm actions were represented. The quality
-gates also gave me a clearer way to verify generated code instead of accepting
-it because it looked correct.
+The diagrams and phased plan were incredibly useful because they gave me a concrete artifact to review before a single line of code was generated. I could verify that the six plots, dashboard, chat panel, and core actions were accounted for. The quality gates also gave me a systematic way to verify the generated code, rather than just blindly accepting it because it compiled.
 
 ### What I would do differently
 
-I would ask for smaller acceptance criteria under each phase. The high-level
-phases were useful, but explicit completion checks would make it easier to tell
-whether a phase was truly complete before moving on.
+I would ask for granular acceptance criteria under each phase. The high-level phases were good, but explicit "Done" checklists would make it much easier to tell if a phase was genuinely complete before moving on to the next.
 
 ## Example 3: Correcting the Git commit strategy
 
 ### What went wrong
 
-The AI initially placed a large amount of work into one giant commit. The code
-might still work, but the history did not follow normal software engineering
-practice. It was difficult to see which commit introduced the model, storage,
-UI, tests, or documentation.
+The AI initially dumped a massive chunk of work into one monolithic commit. Sure, the code worked, but the history was a nightmare. It violated basic version control hygiene—it was impossible to isolate which commit introduced the model, storage, UI, tests, or docs.
 
-This happened because my implementation prompt focused on the finished MVP and
-did not state how the work should be committed. The AI optimised for completing
-the build, while I assumed that it would naturally create separate commits by
-feature or concern.
+This happened because my implementation prompt indexed heavily on finishing the MVP and completely ignored the commit strategy. The AI optimized for getting the code to run, while I assumed it would naturally create atomic, feature-scoped commits.
 
 ### How the prompt evolved
 
-I explicitly asked the AI to reorganise the work into focused commits. I also
-asked it to record the commit convention in the project-level memory so that the
-same mistake would not be repeated. This was an example where correcting the
-current output was not enough; I also wanted to improve later behaviour.
+I explicitly commanded the AI to rewrite the history and reorganize the work into focused commits. More importantly, I had it record this commit convention into the project-level memory so it wouldn't make the same mistake twice. This was a great example of not just fixing the current output, but actively patching the AI's future behavior.
 
 ### What I learnt
 
-AI-assisted development still requires me to state process requirements. Good
-code is only one part of software engineering. Commit history, reviewability,
-and traceability also matter. Next time, I would specify the branch and commit
-strategy before coding begins and inspect the history after each major phase,
-instead of fixing the entire history at the end.
+AI-assisted development still requires aggressive hand-holding when it comes to SWE processes. Shipping working code is only half the job—commit history, reviewability, and traceability matter just as much. Next time, I’ll define the branching and commit strategy *before* coding starts, and inspect the history after each major phase instead of trying to untangle it at the end.
 
-## Example 4: Improving the developer and user documentation prompts
+## Example 4: Improving the developer and user docs
 
 ### What went wrong
 
-The AI did not automatically produce the level of developer documentation I
-expected. Important items such as user stories and detailed diagrams were
-missing. Some generated diagrams also lacked enough detail to explain the
-system clearly.
+The AI didn't magically output the level of developer documentation I expected. Crucial artifacts like user stories and detailed diagrams were missing, and the diagrams it *did* generate lacked the depth needed to actually explain the system. 
 
-My first documentation request was too general. Asking for a Developer Guide
-and User Guide did not define the expected standard, structure, or depth. The AI
-produced what it considered sufficient, but that did not necessarily match the
-style I was familiar with from CS2103/T.
+My initial prompt was too generic. Just asking for a "Developer Guide" and "User Guide" didn't define the expected standard, structure, or technical depth. The AI generated what it thought was "good enough," but it fell way short of the rigor I was used to from modules like CS2103T.
 
 ### How I refined the prompt
 
-I made the requirements more concrete. I asked for the Developer Guide to use a
-top-down, breadth-first explanation and to include the necessary architecture,
-sequence, and activity diagrams. I also stated that the User Guide should be
-simple, easy to follow, and supported by screenshots. Where necessary, I could
-ask the AI to refer to the CS2103/T tP documentation to understand the expected
-standard and the tools used to draw diagrams.
+I got highly specific. I demanded that the Developer Guide use a top-down, breadth-first approach, complete with proper architecture, sequence, and activity diagrams. I also specified that the User Guide had to be idiot-proof and heavily supported by screenshots. I even told the AI to reference the standard CS2103T tP documentation to calibrate its expectations and to use the right tools for diagramming.
 
 ### Engineering judgement required
 
-The AI could help rewrite text and propose diagrams, but I still had to decide
-which diagrams were actually useful and whether they matched the code. Adding
-more diagrams does not automatically improve documentation. They must explain
-the correct flow and remain consistent with the current implementation.
+The AI is great at drafting text and proposing diagrams, but I still had to be the filter. I had to decide if a diagram actually added value or if it accurately reflected the codebase. Throwing more UML at a doc doesn't make it better—it has to explain the right flows and stay perfectly synced with the implementation.
 
-Next time, I would provide a documentation checklist at the start and ask the
-AI to map every requested section to evidence in the code before writing it.
+Next time, I’ll feed it a strict documentation checklist upfront and force the AI to map every requested section to actual evidence in the codebase before it starts writing.
 
-## Example 5: Using Greptile findings without accepting them blindly
+## Example 5: Using Greptile findings without blind trust
 
 ### How I used AI review
 
-Once the codebase became large, reading every file manually took too much time.
-I used Greptile to review the code and highlight areas that needed attention.
-I then asked the coding AI to verify individual findings and fix them only when
-they were valid.
+As the codebase grew, manual review became a bottleneck. I brought in Greptile to run sweeps over the code and flag suspicious areas, then used my coding AI to verify those findings and patch the valid ones.
 
-This helped filter the code so I could focus on higher-risk areas. However, the
-review output was not a replacement for understanding the code. I still spent
-a lot of time following the reasoning behind each finding and checking how the
-affected logic worked.
+This acted as a great filter, letting me focus my mental energy on high-risk areas. But the review output wasn't a replacement for actually understanding the codebase. I still had to spend significant time tracing the logic behind each flag to see how it impacted the system.
 
 ### Verification and limitations
 
-I did not accept a finding only because it came from another AI tool. I used my
-own developer testing workflow and manually tested the relevant scenarios. This
-was especially important for bugs involving several steps or a failure path,
-where a short review comment might not describe the full behaviour.
+I never blindly accepted a finding just because an AI tool flagged it. I stuck to my standard developer testing workflow and manually tested the edge cases. This was critical for multi-step bugs or failure paths, where a single-line review comment rarely captures the full blast radius of a bug.
 
-This was also where prompting became less effective than manual work. AI review
-was good at pointing me towards suspicious code, but I still needed to execute
-the scenario, observe the result, and decide whether the proposed fix preserved
-the intended behaviour.
+This is exactly where prompting hits a wall compared to manual engineering. AI review is excellent at pointing a flashlight at weird code, but I still had to execute the scenario, observe the state, and make the final call on whether a proposed fix preserved the intended behavior.
 
 ### What I would do differently
 
-For future reviews, I would ask for a reproducible test case together with every
-finding. That would make the reasoning easier to verify and would turn a review
-comment into a concrete regression test before any fix is applied.
+For future reviews, I’ll prompt the AI to generate a reproducible test case alongside every finding. That forces it to prove the bug exists, makes the reasoning easier to verify, and turns a vague review comment into a concrete regression test *before* any code gets touched.
 
 ## Overall reflection
 
-The main benefit of AI was speed: it helped me move from a rough idea to a plan,
-generate implementation work, review a large codebase, and polish
-documentation. The main limitation was that it often needed more explicit
-instructions about software engineering process and documentation standards.
+The biggest ROI of using AI was pure velocity: it rapidly accelerated moving from rough idea to structured plan, generating boilerplate, reviewing a bulky codebase, and formatting docs. The main limitation is that it requires explicit, constant guardrails around SWE processes and documentation standards.
 
-The most important judgement still remained with me. I had to approve the plan,
-decide whether the architecture was appropriate, correct the Git workflow,
-judge the usefulness of documentation, and verify code-review findings through
-testing. The quality of the result depended not only on the AI's output, but on
-how carefully I framed the prompts and checked what it produced.
+At the end of the day, the core engineering judgement still sits entirely with me. I had to approve the architecture, enforce the Git workflow, curate the documentation, and rigorously verify code-review findings. The quality of the final product didn't just depend on the AI's raw output—it depended heavily on how tightly I scoped the prompts and how strictly I audited the results.
