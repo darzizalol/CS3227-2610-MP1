@@ -83,10 +83,10 @@ only on a coverage percentage.
 
 ### Engineering judgement and verification
 
-The implementation compiles with `-Xlint:all -Werror`. The `check` task fails
-below 80% line or 70% branch coverage for core packages. Time tests inject a
-mutable clock and never sleep. The build also packages the JAR early instead of
-waiting for submission week.
+The implementation compiles with `-Xlint:all -Werror`. The `check` task rejects
+Javadoc warnings and fails below 80% line or 70% branch coverage for core
+packages. Time tests inject a mutable clock and never sleep. The build also
+packages the JAR early instead of waiting for submission week.
 
 The first test run exposed a missing JUnit Platform launcher dependency under
 Gradle 9.1. A later test exposed an unescaped percent sign in a formatted help

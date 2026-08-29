@@ -92,10 +92,11 @@ Run the mandatory local gate:
 ./gradlew clean check
 ```
 
-The gate compiles with `-Xlint:all -Werror`, runs Checkstyle, executes JUnit,
-and enforces at least 80% line and 70% branch coverage for model, logic, and
-storage packages. UI code is manually inspected because JavaFX rendering is
-not meaningfully verified by unit coverage alone.
+The gate compiles with `-Xlint:all -Werror`, generates warning-free Javadocs,
+runs Checkstyle, executes JUnit, and enforces at least 80% line and 70% branch
+coverage for model, logic, and storage packages. Generated API documentation is
+available at `build/docs/javadoc/index.html`. UI code is manually inspected
+because JavaFX rendering is not meaningfully verified by unit coverage alone.
 
 CI repeats the quality gate and builds a platform-specific JAR on Windows,
 Linux, and macOS. Before release, also run:
