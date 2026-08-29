@@ -42,6 +42,10 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs.addAll(['-Xlint:all', '-Werror'])
 }
 
+tasks.withType(Javadoc).configureEach {
+    options.addBooleanOption('Werror', true)
+}
+
 test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
@@ -91,6 +95,7 @@ checkstyle {
 
 tasks.named('check') {
     dependsOn jacocoTestCoverageVerification
+    dependsOn javadoc
 }
 
 tasks.register('fatJar', Jar) {

@@ -14,7 +14,13 @@ public final class DurationParser {
     private DurationParser() {
     }
 
-    /** Parses seconds or minutes into a Java duration. */
+    /**
+     * Parses a duration expressed in seconds or minutes.
+     *
+     * @param input duration such as {@code 10s} or {@code 1m}
+     * @return the parsed duration
+     * @throws FarmException if the value is malformed or too large
+     */
     public static Duration parse(String input) throws FarmException {
         Matcher matcher = DURATION_PATTERN.matcher(input.toLowerCase(Locale.ROOT));
         if (!matcher.matches()) {

@@ -31,7 +31,13 @@ public final class MainWindow {
     private final CountdownRefreshCoordinator refreshCoordinator;
     private final Timeline refreshTimeline;
 
-    /** Creates the complete 70:30 Focus Farm window. */
+    /**
+     * Creates the complete 70:30 Focus Farm window.
+     *
+     * @param stage JavaFX window
+     * @param logic application logic
+     * @param exitHandler callback for a successful exit command
+     */
     public MainWindow(Stage stage, LogicManager logic, Runnable exitHandler) {
         this.stage = Objects.requireNonNull(stage);
         this.logic = Objects.requireNonNull(logic);

@@ -26,7 +26,15 @@ import io.github.darzizalol.focusfarm.testutil.MutableClock;
 public final class UiSnapshotApp extends Application {
     private MainWindow mainWindow;
 
-    /** Launches the snapshot harness. */
+    /** Creates the visual-inspection application. */
+    public UiSnapshotApp() {
+    }
+
+    /**
+     * Launches the snapshot harness.
+     *
+     * @param args JavaFX launch arguments
+     */
     public static void main(String[] args) {
         Application.launch(args);
     }

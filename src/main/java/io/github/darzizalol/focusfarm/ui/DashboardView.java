@@ -55,7 +55,11 @@ public final class DashboardView extends VBox {
         getChildren().addAll(header, inventory, recentLabel);
     }
 
-    /** Refreshes counts and recent harvest information. */
+    /**
+     * Refreshes counts and recent harvest information.
+     *
+     * @param snapshot farm state to display
+     */
     public void update(FarmSnapshot snapshot) {
         for (CropType crop : CropType.values()) {
             cropCounts.get(crop).setText(crop.displayName() + "  " + snapshot.inventory().getOrDefault(crop, 0));

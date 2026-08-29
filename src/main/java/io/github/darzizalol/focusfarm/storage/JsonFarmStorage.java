@@ -27,12 +27,21 @@ public final class JsonFarmStorage implements FarmStorage {
     private final ObjectMapper objectMapper;
     private final Clock clock;
 
-    /** Creates JSON storage at the supplied path. */
+    /**
+     * Creates JSON storage at the supplied path.
+     *
+     * @param dataPath farm data file
+     */
     public JsonFarmStorage(Path dataPath) {
         this(dataPath, Clock.systemUTC());
     }
 
-    /** Creates JSON storage with an injectable clock for deterministic backup names. */
+    /**
+     * Creates JSON storage with a clock for backup timestamps.
+     *
+     * @param dataPath farm data file
+     * @param clock clock used to name corrupt-data backups
+     */
     public JsonFarmStorage(Path dataPath, Clock clock) {
         this.dataPath = Objects.requireNonNull(dataPath);
         this.clock = Objects.requireNonNull(clock);
@@ -92,7 +101,12 @@ public final class JsonFarmStorage implements FarmStorage {
         }
     }
 
-    /** On-disk envelope that allows future schema migrations. */
+    /**
+     * On-disk envelope that allows future schema migrations.
+     *
+     * @param schemaVersion stored schema version
+     * @param farm stored farm state
+     */
     public record StoredFarm(int schemaVersion, FarmSnapshot farm) {
     }
 }

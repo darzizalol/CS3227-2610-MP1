@@ -6,7 +6,11 @@ import io.github.darzizalol.focusfarm.logic.FarmEvent;
 import io.github.darzizalol.focusfarm.model.Farm;
 import io.github.darzizalol.focusfarm.model.FarmException;
 
-/** Fertilizes a growing plot once to reduce its remaining time by 25 percent. */
+/**
+ * Fertilizes a growing plot once to reduce its remaining time.
+ *
+ * @param plotId one-based plot identifier
+ */
 public record FertilizeCommand(int plotId) implements FarmCommand {
     @Override
     public CommandResult execute(Farm farm) throws FarmException {

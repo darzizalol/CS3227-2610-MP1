@@ -6,7 +6,9 @@ import java.util.Objects;
 
 /** Encapsulates the state machine and timing data for one plot. */
 public final class FarmPlot {
+    /** Shortest accepted crop growth duration. */
     public static final Duration MINIMUM_GROWTH_DURATION = Duration.ofSeconds(10);
+    /** Longest accepted crop growth duration. */
     public static final Duration MAXIMUM_GROWTH_DURATION = Duration.ofMinutes(60);
 
     private final int id;
@@ -16,7 +18,11 @@ public final class FarmPlot {
     private Instant readyAt;
     private boolean fertilized;
 
-    /** Creates an empty plot with a stable one-based identifier. */
+    /**
+     * Creates an empty plot.
+     *
+     * @param id stable one-based plot identifier
+     */
     public FarmPlot(int id) {
         if (id < 1) {
             throw new IllegalArgumentException("Plot ID must be positive.");
@@ -25,7 +31,14 @@ public final class FarmPlot {
         reset();
     }
 
-    /** Restores a plot from validated persisted data. */
+    /**
+     * Restores a plot from persisted data and refreshes its maturity.
+     *
+     * @param snapshot persisted plot state
+     * @param now current authoritative time
+     * @return the restored plot
+     * @throws FarmException if the persisted state is inconsistent
+     */
     public static FarmPlot restore(PlotSnapshot snapshot, Instant now) throws FarmException {
         Objects.requireNonNull(snapshot);
         FarmPlot plot = new FarmPlot(snapshot.id());
@@ -39,7 +52,13 @@ public final class FarmPlot {
         return plot;
     }
 
-    /** Plants a crop without starting its timer. */
+    /**
+     * Plants a crop without starting its timer.
+     *
+     * @param cropType crop to plant
+     * @param duration configured growth duration
+     * @throws FarmException if the plot is occupied or the duration is invalid
+     */
     public void plant(CropType cropType, Duration duration) throws FarmException {
         if (state != PlotState.EMPTY) {
             throw new FarmException("Plot " + id + " is occupied. Harvest its crop before planting again.");
@@ -52,7 +71,12 @@ public final class FarmPlot {
         fertilized = false;
     }
 
-    /** Waters a planted crop and starts its authoritative growth timer. */
+    /**
+     * Waters a planted crop and starts its growth timer.
+     *
+     * @param now current authoritative time
+     * @throws FarmException if the crop cannot be watered
+     */
     public void water(Instant now) throws FarmException {
         if (state == PlotState.EMPTY) {
             throw new FarmException("Plot " + id + " is empty. Plant a crop before watering it.");
@@ -64,7 +88,12 @@ public final class FarmPlot {
         state = PlotState.GROWING;
     }
 
-    /** Applies fertilizer once, reducing the current remaining time by 25 percent. */
+    /**
+     * Applies fertilizer once and reduces the remaining time by 25 percent.
+     *
+     * @param now current authoritative time
+     * @throws FarmException if the crop is not growing or was already fertilized
+     */
     public void fertilize(Instant now) throws FarmException {
         refresh(now);
         if (state != PlotState.GROWING) {
@@ -78,7 +107,12 @@ public final class FarmPlot {
         fertilized = true;
     }
 
-    /** Advances a growing plot to ready when its timestamp has elapsed. */
+    /**
+     * Advances an elapsed growing plot to ready.
+     *
+     * @param now current authoritative time
+     * @return {@code true} if the state changed
+     */
     public boolean refresh(Instant now) {
         if (state == PlotState.GROWING && !Objects.requireNonNull(now).isBefore(readyAt)) {
             state = PlotState.READY;
@@ -87,7 +121,11 @@ public final class FarmPlot {
         return false;
     }
 
-    /** Returns an independent mutable copy without advancing time-driven state. */
+    /**
+     * Copies this plot without advancing time-driven state.
+     *
+     * @return an independent mutable copy
+     */
     FarmPlot copy() {
         FarmPlot copy = new FarmPlot(id);
         copy.crop = crop;
@@ -98,7 +136,13 @@ public final class FarmPlot {
         return copy;
     }
 
-    /** Harvests a ready crop and resets the plot. */
+    /**
+     * Harvests a ready crop and resets the plot.
+     *
+     * @param now current authoritative time
+     * @return the completed harvest
+     * @throws FarmException if the crop is not ready
+     */
     public HarvestRecord harvest(Instant now) throws FarmException {
         refresh(now);
         if (state != PlotState.READY) {
@@ -109,7 +153,12 @@ public final class FarmPlot {
         return record;
     }
 
-    /** Returns an immutable snapshot at the supplied instant. */
+    /**
+     * Captures immutable plot data at the supplied time.
+     *
+     * @param now current authoritative time
+     * @return the plot snapshot
+     */
     public PlotSnapshot snapshot(Instant now) {
         long remainingSeconds = 0;
         if (state == PlotState.GROWING) {

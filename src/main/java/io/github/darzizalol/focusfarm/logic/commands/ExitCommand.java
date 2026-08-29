@@ -7,6 +7,10 @@ import io.github.darzizalol.focusfarm.model.Farm;
 
 /** Requests a graceful application exit. */
 public final class ExitCommand implements FarmCommand {
+    /** Creates an exit command. */
+    public ExitCommand() {
+    }
+
     @Override
     public CommandResult execute(Farm farm) {
         return new CommandResult("Farm saved. See you next harvest!", FarmEvent.EXIT, null, false, true);

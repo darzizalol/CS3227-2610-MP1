@@ -10,7 +10,13 @@ import io.github.darzizalol.focusfarm.model.CropType;
 import io.github.darzizalol.focusfarm.model.Farm;
 import io.github.darzizalol.focusfarm.model.FarmException;
 
-/** Plants a crop in an empty plot. */
+/**
+ * Plants a crop in an empty plot.
+ *
+ * @param plotId one-based plot identifier
+ * @param crop crop to plant
+ * @param duration configured growth duration
+ */
 public record PlantCommand(int plotId, CropType crop, Duration duration) implements FarmCommand {
     /** Validates immutable command values. */
     public PlantCommand {

@@ -109,3 +109,15 @@ layout.
   returned. A failed save now reaches the command UI and prevents shutdown.
 - Added regression tests for successful save-before-exit ordering, failed-save
   behavior, and a successful retry after storage recovers.
+
+## Javadoc follow-up
+
+- Added concise API contracts for production model, logic, command, storage,
+  application, and JavaFX classes, plus reusable test support utilities.
+- Documented record components, public constants, parameters, return values,
+  and expected domain exceptions without adding comments to obvious private
+  implementation steps.
+- Added warning-free Javadoc generation to the Gradle `check` gate. Generated
+  documentation is available at `build/docs/javadoc/index.html`.
+- Kept the history reviewable with separate commits for model, logic, storage,
+  UI/application, test support, build enforcement, and project documentation.

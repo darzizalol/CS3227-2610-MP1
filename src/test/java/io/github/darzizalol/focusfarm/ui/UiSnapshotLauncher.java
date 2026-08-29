@@ -7,7 +7,11 @@ public final class UiSnapshotLauncher {
     private UiSnapshotLauncher() {
     }
 
-    /** Launches the deterministic UI snapshot application. */
+    /**
+     * Launches the deterministic UI snapshot application.
+     *
+     * @param args JavaFX launch arguments
+     */
     public static void main(String[] args) {
         Application.launch(UiSnapshotApp.class, args);
     }

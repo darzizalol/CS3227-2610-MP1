@@ -11,6 +11,10 @@ import io.github.darzizalol.focusfarm.model.PlotSnapshot;
 
 /** Displays concise status for all six plots. */
 public final class StatusCommand implements FarmCommand {
+    /** Creates a status command. */
+    public StatusCommand() {
+    }
+
     @Override
     public CommandResult execute(Farm farm) {
         FarmSnapshot snapshot = farm.snapshot();

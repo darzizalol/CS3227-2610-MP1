@@ -12,6 +12,7 @@ import java.util.Objects;
 
 /** Owns the six plots, harvest inventory, and harvest history. */
 public final class Farm {
+    /** Number of plots in every farm. */
     public static final int PLOT_COUNT = 6;
     private static final int MAXIMUM_HISTORY_SIZE = 100;
 
@@ -20,7 +21,11 @@ public final class Farm {
     private final EnumMap<CropType, Integer> inventory;
     private final List<HarvestRecord> harvestHistory;
 
-    /** Creates a new empty six-plot farm. */
+    /**
+     * Creates an empty six-plot farm.
+     *
+     * @param clock authoritative clock for crop timing
+     */
     public Farm(Clock clock) {
         this.clock = Objects.requireNonNull(clock);
         plots = new ArrayList<>();
@@ -31,7 +36,14 @@ public final class Farm {
         harvestHistory = new ArrayList<>();
     }
 
-    /** Restores a farm from persisted snapshot data. */
+    /**
+     * Restores a farm from persisted data.
+     *
+     * @param clock authoritative clock for crop timing
+     * @param snapshot persisted farm state
+     * @return the restored farm
+     * @throws FarmException if the snapshot is inconsistent
+     */
     public static Farm restore(Clock clock, FarmSnapshot snapshot) throws FarmException {
         Objects.requireNonNull(snapshot);
         if (snapshot.plots() == null || snapshot.plots().size() != PLOT_COUNT) {
@@ -57,22 +69,45 @@ public final class Farm {
         return farm;
     }
 
-    /** Plants a crop in a plot. */
+    /**
+     * Plants a crop in an empty plot.
+     *
+     * @param plotId one-based plot identifier
+     * @param crop crop to plant
+     * @param duration configured growth duration
+     * @throws FarmException if the plot or duration is invalid
+     */
     public void plant(int plotId, CropType crop, Duration duration) throws FarmException {
         findPlot(plotId).plant(crop, duration);
     }
 
-    /** Waters a plot and starts its timer. */
+    /**
+     * Waters a planted plot and starts its timer.
+     *
+     * @param plotId one-based plot identifier
+     * @throws FarmException if the plot cannot be watered
+     */
     public void water(int plotId) throws FarmException {
         findPlot(plotId).water(clock.instant());
     }
 
-    /** Fertilizes a growing plot. */
+    /**
+     * Fertilizes a growing plot.
+     *
+     * @param plotId one-based plot identifier
+     * @throws FarmException if the plot cannot be fertilized
+     */
     public void fertilize(int plotId) throws FarmException {
         findPlot(plotId).fertilize(clock.instant());
     }
 
-    /** Harvests a ready crop and records it in the dashboard inventory. */
+    /**
+     * Harvests a ready crop and records it in the inventory.
+     *
+     * @param plotId one-based plot identifier
+     * @return the completed harvest
+     * @throws FarmException if the plot is not ready
+     */
     public HarvestRecord harvest(int plotId) throws FarmException {
         HarvestRecord record = findPlot(plotId).harvest(clock.instant());
         inventory.compute(record.crop(), (crop, count) -> Objects.requireNonNull(count) + 1);
@@ -83,7 +118,11 @@ public final class Farm {
         return record;
     }
 
-    /** Refreshes all plot states from the authoritative clock. */
+    /**
+     * Refreshes plot states from the authoritative clock.
+     *
+     * @return {@code true} if at least one crop became ready
+     */
     public boolean refreshGrowth() {
         boolean changed = false;
         Instant now = clock.instant();
@@ -93,7 +132,11 @@ public final class Farm {
         return changed;
     }
 
-    /** Returns an independent mutable copy without advancing time-driven state. */
+    /**
+     * Copies the farm without advancing time-driven state.
+     *
+     * @return an independent mutable copy
+     */
     public Farm copy() {
         Farm copy = new Farm(clock);
         copy.plots.clear();
@@ -105,7 +148,11 @@ public final class Farm {
         return copy;
     }
 
-    /** Returns an immutable current view of the farm. */
+    /**
+     * Captures the current farm state.
+     *
+     * @return an immutable farm snapshot
+     */
     public FarmSnapshot snapshot() {
         Instant now = clock.instant();
         List<PlotSnapshot> plotSnapshots = plots.stream().map(plot -> plot.snapshot(now)).toList();

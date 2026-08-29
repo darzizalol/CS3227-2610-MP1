@@ -92,10 +92,11 @@ Run the mandatory local gate:
 ./gradlew clean check
 ```
 
-The gate compiles with `-Xlint:all -Werror`, runs Checkstyle, executes JUnit,
-and enforces at least 80% line and 70% branch coverage for model, logic, and
-storage packages. UI code is manually inspected because JavaFX rendering is
-not meaningfully verified by unit coverage alone.
+The gate compiles with `-Xlint:all -Werror`, generates warning-free Javadocs,
+runs Checkstyle, executes JUnit, and enforces at least 80% line and 70% branch
+coverage for model, logic, and storage packages. Generated API documentation is
+available at `build/docs/javadoc/index.html`. UI code is manually inspected
+because JavaFX rendering is not meaningfully verified by unit coverage alone.
 
 CI repeats the quality gate and builds a platform-specific JAR on Windows,
 Linux, and macOS. Before release, also run:
@@ -126,7 +127,7 @@ java -jar release/FocusFarm.jar
 ## Acknowledgements
 
 - The component separation and command architecture were informed by the
-  CS2103/T AddressBook-Level3-derived tP previously completed by the author.
+  CS2103/T AddressBook-Level3-derived tP.
   That project and AB3 are available under the MIT License. No address-book
   domain classes, commands, or assets were copied into Focus Farm.
 - JavaFX provides the desktop UI and animation APIs.

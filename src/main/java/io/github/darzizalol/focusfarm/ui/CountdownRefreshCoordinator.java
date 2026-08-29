@@ -14,6 +14,14 @@ final class CountdownRefreshCoordinator {
     private final Consumer<String> appendError;
     private boolean failureReported;
 
+    /**
+     * Creates a coordinator for one countdown timeline.
+     *
+     * @param logic farm logic to refresh
+     * @param refreshUi callback that redraws farm views
+     * @param appendFarm callback for recovery messages
+     * @param appendError callback for persistence errors
+     */
     CountdownRefreshCoordinator(LogicManager logic, Runnable refreshUi, Consumer<String> appendFarm,
             Consumer<String> appendError) {
         this.logic = Objects.requireNonNull(logic);

@@ -8,6 +8,10 @@ import io.github.darzizalol.focusfarm.model.Farm;
 
 /** Displays the complete MVP command reference. */
 public final class HelpCommand implements FarmCommand {
+    /** Creates a help command. */
+    public HelpCommand() {
+    }
+
     @Override
     public CommandResult execute(Farm farm) {
         String help = """
