@@ -1,0 +1,26 @@
+@startuml
+title Lifecycle of one farm plot
+
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam shadowing false
+hide empty description
+
+[*] --> EMPTY
+EMPTY --> PLANTED : /plant\nstore crop and duration
+PLANTED --> GROWING : /water\nset readyAt
+GROWING --> GROWING : /fertilize (once)\nreduce remaining time by 25%
+GROWING --> READY : Clock reaches readyAt
+READY --> EMPTY : /harvest\nrecord crop and reset plot
+
+note right of GROWING
+  Closing the app does not pause growth.
+  readyAt is an absolute Instant.
+end note
+
+note bottom of PLANTED
+  A planted crop does not grow
+  until it is watered.
+end note
+
+@enduml

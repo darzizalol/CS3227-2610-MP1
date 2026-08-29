@@ -1,0 +1,37 @@
+@startuml
+title Focus Farm architecture
+
+skinparam backgroundColor white
+skinparam componentStyle rectangle
+skinparam defaultFontName Arial
+skinparam shadowing false
+top to bottom direction
+
+actor User
+
+rectangle "Application\n----\nLauncher\nFocusFarmApp" as Application #F5F5F5
+rectangle "UI (JavaFX)\n----\nMainWindow\nFarmView / PlotView\nDashboardView\nChatPanel\nCountdownRefreshCoordinator" as UI #E8F5E9
+rectangle "Logic\n----\nLogicManager\nCommandParser\nFarmCommand implementations\nCommandResult / FarmEvent" as Logic #E3F2FD
+rectangle "Model\n----\nFarm\nSix FarmPlot state machines\nImmutable snapshots\njava.time.Clock" as Model #FFF8E1
+rectangle "Storage\n----\nFarmStorage\nJsonFarmStorage" as Storage #FCE4EC
+database "data/farm.json" as FarmFile
+
+User --> UI : enters slash commands\nand reads views
+Application --> UI : creates window
+Application --> Logic : creates manager
+UI --> Logic : execute commands and\nrefresh countdowns
+Logic --> Model : copy, query, and mutate
+Logic --> Storage : load and save snapshots
+Storage --> FarmFile : JSON read and replace
+
+note right of UI
+  UI views receive immutable snapshots.
+  Animations are cosmetic only.
+end note
+
+note right of Logic
+  A changed candidate Farm is saved
+  before it becomes the live Farm.
+end note
+
+@enduml

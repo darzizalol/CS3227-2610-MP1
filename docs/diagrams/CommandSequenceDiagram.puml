@@ -1,0 +1,41 @@
+@startuml
+title Successful and failed state-changing command execution
+
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam shadowing false
+hide footbox
+
+actor User
+participant MainWindow
+participant LogicManager
+participant CommandParser
+participant FarmCommand
+participant "candidate : Farm" as Candidate
+participant FarmStorage
+
+User -> MainWindow : submit command
+MainWindow -> LogicManager : execute(input)
+LogicManager -> CommandParser : parse(input)
+CommandParser --> LogicManager : FarmCommand
+LogicManager -> LogicManager : copy live Farm
+LogicManager -> FarmCommand : execute(candidate)
+FarmCommand -> Candidate : perform domain operation
+Candidate --> FarmCommand
+FarmCommand --> LogicManager : CommandResult
+LogicManager -> Candidate : snapshot()
+Candidate --> LogicManager : FarmSnapshot
+LogicManager -> FarmStorage : save(snapshot)
+
+alt save succeeds
+  FarmStorage --> LogicManager : saved
+  LogicManager -> LogicManager : publish candidate as live Farm
+  LogicManager --> MainWindow : CommandResult
+  MainWindow --> User : feedback and refreshed views
+else save fails
+  FarmStorage --> LogicManager : StorageException
+  LogicManager --> MainWindow : FarmException
+  MainWindow --> User : error; live Farm is unchanged
+end
+
+@enduml
