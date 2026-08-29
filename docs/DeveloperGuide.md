@@ -126,7 +126,7 @@ java -jar release/FocusFarm.jar
 ## Acknowledgements
 
 - The component separation and command architecture were informed by the
-  CS2103/T AddressBook-Level3-derived tP previously completed by the author.
+  CS2103/T AddressBook-Level3-derived tP.
   That project and AB3 are available under the MIT License. No address-book
   domain classes, commands, or assets were copied into Focus Farm.
 - JavaFX provides the desktop UI and animation APIs.
