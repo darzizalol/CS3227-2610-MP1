@@ -56,6 +56,11 @@ storage failure cannot leak an unpersisted command or timer transition into the
 UI. Read-only commands do not cause writes. Time-driven transitions are saved
 only when a crop actually becomes ready.
 
+The `/exit` command is the deliberate exception to the read-only rule:
+`LogicManager` saves before returning its exit request. A save failure therefore
+reaches the UI before shutdown is scheduled, leaving the application open for a
+retry.
+
 ### Model and time
 
 Each `FarmPlot` implements this state machine:
@@ -111,6 +116,8 @@ java -jar release/FocusFarm.jar
   backup creation, and parent-directory creation.
 - Logic tests inject save failures and verify that command and timer mutations
   are discarded until persistence succeeds.
+- Exit tests verify that success is returned only after saving and that a failed
+  shutdown save leaves `/exit` available for retry.
 - UI coordination tests verify that failed timer saves are retried, duplicate
   errors are suppressed, and the dashboard refreshes after recovery.
 - A manual GUI session checks the 70:30 layout, countdown refresh, animations,

@@ -99,3 +99,13 @@ layout.
   recovery after the first successful retry.
 - Added a behavioral test using a recoverable storage failure to verify the
   retry, message suppression, successful UI refresh, and ready-state transition.
+
+## Exit durability follow-up
+
+- Confirmed that `/exit` previously returned “Farm saved” and scheduled shutdown
+  before the actual save in `Application.stop()`, where a failure reached only
+  standard error.
+- Moved the exit save into `LogicManager.execute()` before the exit result is
+  returned. A failed save now reaches the command UI and prevents shutdown.
+- Added regression tests for successful save-before-exit ordering, failed-save
+  behavior, and a successful retry after storage recovers.

@@ -52,10 +52,29 @@ class LogicManagerTest {
     void execute_readOnlyCommands_doNotSave() throws Exception {
         assertEquals(FarmEvent.HELP, logic.execute("/help").event());
         assertEquals(FarmEvent.STATUS, logic.execute("/status").event());
-        CommandResult exit = logic.execute("/exit");
-        assertTrue(exit.exitRequested());
         assertEquals(0, storage.saveCount);
         logic.close();
+        assertEquals(1, storage.saveCount);
+    }
+
+    @Test
+    void execute_exit_savesBeforeReturningExitRequest() throws Exception {
+        CommandResult exit = logic.execute("/exit");
+
+        assertTrue(exit.exitRequested());
+        assertTrue(exit.feedback().contains("Farm saved"));
+        assertEquals(1, storage.saveCount);
+    }
+
+    @Test
+    void execute_exitSaveFailure_throwsAndAllowsRetry() throws Exception {
+        storage.failSave = true;
+
+        assertThrows(FarmException.class, () -> logic.execute("/exit"));
+        assertEquals(0, storage.saveCount);
+
+        storage.failSave = false;
+        assertTrue(logic.execute("/exit").exitRequested());
         assertEquals(1, storage.saveCount);
     }
 

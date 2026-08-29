@@ -43,6 +43,8 @@ public final class LogicManager {
         CommandResult result = command.execute(candidate);
         if (result.stateChanged()) {
             commit(candidate);
+        } else if (result.exitRequested()) {
+            save(candidate.snapshot());
         }
         return result;
     }

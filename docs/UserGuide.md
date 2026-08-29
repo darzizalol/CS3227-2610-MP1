@@ -124,7 +124,9 @@ This prints the crop and state of every plot in the terminal.
 /exit
 ```
 
-`/exit` saves the farm before closing the window.
+`/exit` saves the farm before closing the window. If that save fails, Focus Farm
+reports the error and remains open so you can correct the storage problem and
+retry `/exit` without losing recent progress.
 
 ## Persistence
 
