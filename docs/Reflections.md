@@ -1,101 +1,109 @@
-# Reflections on AI-Assisted Software Engineering
+# Disclaimer
+This reflection was polished by an AI, but the core content, engineering decisions, and reflections are entirely my own (ZhengHao).
 
-This is a living document. The examples below cover the initial requirements,
-architecture, and MVP build. They should be revisited after manual acceptance
-testing and later development increments.
+# Reflections on AI-Assisted Software Engineering 
 
-## Example 1: Challenging the initial product concept
+This document captures my workflow using prompting and AI tools while building Focus Farm for CS3227. I didn't just treat the AI as an overgrown autocomplete for code generation—I integrated it into the entire lifecycle: planning, implementation, code review, debugging, and writing docs. The examples below highlight prompts that actually shifted my workflow or exposed where AI-assisted dev falls short.
 
-### Prompt and intent
+## Example 1: Giving context and asking the AI to grill me
 
-The initial request proposed a pixel room containing a whiteboard and trash bin,
-controlled through commands that added and deleted to-dos. The prompt also
-included the assignment restriction against recreating a to-do manager.
+### How I prompted
 
-The prompt was intentionally broad because the first goal was feasibility and
-planning, not code generation. It asked the LLM not to hallucinate and to
-inspect the inherited tP stack.
+I started by giving the AI the CS3227 project description and my initial idea. The crux of my prompt was deliberately *not* asking it to write code right away. Instead, I told it to grill me on my requirements, clarify ambiguities, sanity-check the idea's feasibility, and strictly avoid hallucinating features.
 
-### LLM assumptions and response
+I framed the prompt this way because my initial specs were pretty rough. If I had just said "build this app", the AI would have confidently filled in the blanks with its own assumptions—which might not have aligned with what I actually wanted or what the assignment rubric demanded.
 
-The LLM treated product functionality, rather than visual presentation, as the
-deciding factor. It concluded that adding game graphics did not make a to-do
-manager a different product. It recommended preserving the visual interaction
-while changing the underlying utility.
+### What I learnt
 
-### Engineering judgement and verification
+Establishing the assignment context kept the AI grounded in reality and project constraints. Asking for pushback also made the planning phase highly interactive. Instead of treating the first generated idea as gospel, I could review the AI's interpretation and decide if we were actually on the same page.
 
-This was useful pushback. A superficially appealing implementation could have
-violated an explicit assignment restriction. The conclusion was verified
-against the supplied assignment text and the current official Project Duke
-guidance. The student then replaced the concept with a farm timer.
+My prompts gradually became more specific. I fed it context, reviewed the proposed tech stack, architecture, UI, and features, and only approved the build once I was satisfied with the blueprint. This gave me a strict, necessary checkpoint between ideation and execution.
 
-### What could improve
+### What I would do differently
 
-The prompt could have stated an explicit decision criterion such as “reject any
-idea whose core data model remains tasks.” That would make the evaluation less
-dependent on the LLM inferring the distinction between theme and function.
+Next time, I would still ask the AI to challenge the requirements, but I would explicitly list my non-negotiables upfront. This establishes clear boundaries on which parts the AI can creatively propose and which parts it needs to leave alone.
 
-## Example 2: Turning a farm game into a personal utility
+## Example 2: Turning an idea into an implementation plan
 
-### Prompt and intent
+### How I prompted
 
-The follow-up proposed planting, watering, fertilizer, timed growth, harvesting,
-six plots, and a harvest dashboard. It again requested a non-hallucinated
-feasibility check.
+Once we locked in the idea, I prompted the AI to map out a structured implementation plan. The blueprint covered the architecture, a 70:30 farm-and-chat interface, the six farm plots, the dashboard, commands, and JSON persistence. The architecture cleanly decoupled the application into UI, logic, model, and storage components.
 
-### LLM assumptions and response
+I also forced it to split the work into logical phases:
 
-The LLM identified a new ambiguity: a pure farming game might not qualify as a
-personal utility app. It suggested framing the same mechanics as a gamified
-countdown timer and harvest tracker. It also proposed absolute timestamps,
-continued growth while closed, six independent plot state machines, and a
-one-time 25% fertilizer reduction.
+1. Bootstrap the project.
+2. Build the domain foundation.
+3. Add commands and storage.
+4. Build a vertical UI slice.
+5. Complete the farm and dashboard.
+6. Harden and package the release.
 
-### Engineering judgement and verification
+The prompt included strict quality gates: Checkstyle, strict compiler warnings, JUnit, JaCoCo coverage, cross-platform CI, and JAR generation.
 
-The student explicitly approved the combined assumptions before coding. The
-timing design was checked against JavaFX documentation, which states that
-animation keyframes are not guaranteed to execute at an exact instant. The
-implementation therefore uses `java.time.Clock` and persisted `Instant` values
-for correctness, with JavaFX `Timeline` used only to refresh the display.
+### Assumptions and engineering judgement
 
-### What could improve
+The AI assumed the UI, command handling, model, and persistence should be isolated. I agreed—it’s standard SWE practice, makes the design extensible, and keeps JavaFX spaghetti out of the core farm logic. However, I still had to do a vibe check on whether the proposed structure actually matched the scope of an individual school project. A design can look beautifully organized on paper but still be massively over-engineered.
 
-Fertilizer makes a countdown shorter, which weakens a strict “focus timer”
-interpretation. Describing the product as a general personal countdown timer is
-more accurate. A later usability study could determine whether users understand
-that distinction.
+The diagrams and phased plan were incredibly useful because they gave me a concrete artifact to review before a single line of code was generated. I could verify that the six plots, dashboard, chat panel, and core actions were accounted for. The quality gates also gave me a systematic way to verify the generated code, rather than just blindly accepting it because it compiled.
 
-## Example 3: Asking for enforceable code quality
+### What I would do differently
 
-### Prompt and intent
+I would ask for granular acceptance criteria under each phase. The high-level phases were good, but explicit "Done" checklists would make it much easier to tell if a phase was genuinely complete before moving on to the next.
 
-The student asked how code quality would be ensured throughout the build, not
-merely reviewed after implementation.
+## Example 3: Correcting the Git commit strategy
 
-### LLM assumptions and response
+### What went wrong
 
-The LLM proposed a single Gradle quality gate combining compiler warnings,
-Checkstyle, JUnit, coverage verification, and CI. It treated deterministic time
-testing and architectural boundaries as quality properties rather than relying
-only on a coverage percentage.
+The AI initially dumped a massive chunk of work into one monolithic commit. Sure, the code worked, but the history was a nightmare. It violated basic version control hygiene—it was impossible to isolate which commit introduced the model, storage, UI, tests, or docs.
 
-### Engineering judgement and verification
+This happened because my implementation prompt indexed heavily on finishing the MVP and completely ignored the commit strategy. The AI optimized for getting the code to run, while I assumed it would naturally create atomic, feature-scoped commits.
 
-The implementation compiles with `-Xlint:all -Werror`. The `check` task rejects
-Javadoc warnings and fails below 80% line or 70% branch coverage for core
-packages. Time tests inject a mutable clock and never sleep. The build also
-packages the JAR early instead of waiting for submission week.
+### How the prompt evolved
 
-The first test run exposed a missing JUnit Platform launcher dependency under
-Gradle 9.1. A later test exposed an unescaped percent sign in a formatted help
-message. Both failures demonstrate that compiling production code alone was not
-enough; executing the real toolchain caught concrete integration mistakes.
+I explicitly commanded the AI to rewrite the history and reorganize the work into focused commits. More importantly, I had it record this commit convention into the project-level memory so it wouldn't make the same mistake twice. This was a great example of not just fixing the current output, but actively patching the AI's future behavior.
 
-### What could improve
+### What I learnt
 
-Coverage thresholds can encourage low-value tests. Future prompts should ask
-for mutation-resistant behavioural tests and review uncovered branches rather
-than only increasing a number. GUI behaviour still needs manual and
-cross-platform inspection.
+AI-assisted development still requires aggressive hand-holding when it comes to SWE processes. Shipping working code is only half the job—commit history, reviewability, and traceability matter just as much. Next time, I’ll define the branching and commit strategy *before* coding starts, and inspect the history after each major phase instead of trying to untangle it at the end.
+
+## Example 4: Improving the developer and user docs
+
+### What went wrong
+
+The AI didn't magically output the level of developer documentation I expected. Crucial artifacts like user stories and detailed diagrams were missing, and the diagrams it *did* generate lacked the depth needed to actually explain the system. 
+
+My initial prompt was too generic. Just asking for a "Developer Guide" and "User Guide" didn't define the expected standard, structure, or technical depth. The AI generated what it thought was "good enough," but it fell way short of the rigor I was used to from modules like CS2103T.
+
+### How I refined the prompt
+
+I got highly specific. I demanded that the Developer Guide use a top-down, breadth-first approach, complete with proper architecture, sequence, and activity diagrams. I also specified that the User Guide had to be idiot-proof and heavily supported by screenshots. I even told the AI to reference the standard CS2103T tP documentation to calibrate its expectations and to use the right tools for diagramming.
+
+### Engineering judgement required
+
+The AI is great at drafting text and proposing diagrams, but I still had to be the filter. I had to decide if a diagram actually added value or if it accurately reflected the codebase. Throwing more UML at a doc doesn't make it better—it has to explain the right flows and stay perfectly synced with the implementation.
+
+Next time, I’ll feed it a strict documentation checklist upfront and force the AI to map every requested section to actual evidence in the codebase before it starts writing.
+
+## Example 5: Using Greptile findings without blind trust
+
+### How I used AI review
+
+As the codebase grew, manual review became a bottleneck. I brought in Greptile to run sweeps over the code and flag suspicious areas, then used my coding AI to verify those findings and patch the valid ones.
+
+This acted as a great filter, letting me focus my mental energy on high-risk areas. But the review output wasn't a replacement for actually understanding the codebase. I still had to spend significant time tracing the logic behind each flag to see how it impacted the system.
+
+### Verification and limitations
+
+I never blindly accepted a finding just because an AI tool flagged it. I stuck to my standard developer testing workflow and manually tested the edge cases. This was critical for multi-step bugs or failure paths, where a single-line review comment rarely captures the full blast radius of a bug.
+
+This is exactly where prompting hits a wall compared to manual engineering. AI review is excellent at pointing a flashlight at weird code, but I still had to execute the scenario, observe the state, and make the final call on whether a proposed fix preserved the intended behavior.
+
+### What I would do differently
+
+For future reviews, I’ll prompt the AI to generate a reproducible test case alongside every finding. That forces it to prove the bug exists, makes the reasoning easier to verify, and turns a vague review comment into a concrete regression test *before* any code gets touched.
+
+## Overall reflection
+
+The biggest ROI of using AI was pure velocity: it rapidly accelerated moving from rough idea to structured plan, generating boilerplate, reviewing a bulky codebase, and formatting docs. The main limitation is that it requires explicit, constant guardrails around SWE processes and documentation standards.
+
+At the end of the day, the core engineering judgement still sits entirely with me. I had to approve the architecture, enforce the Git workflow, curate the documentation, and rigorously verify code-review findings. The quality of the final product didn't just depend on the AI's raw output—it depended heavily on how tightly I scoped the prompts and how strictly I audited the results.
