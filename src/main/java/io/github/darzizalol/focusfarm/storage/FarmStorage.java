@@ -6,9 +6,19 @@ import io.github.darzizalol.focusfarm.model.FarmSnapshot;
 
 /** Persistence boundary for Focus Farm data. */
 public interface FarmStorage {
-    /** Loads a saved farm, or returns empty when no data file exists yet. */
+    /**
+     * Loads the saved farm.
+     *
+     * @return saved state, or empty if no data file exists
+     * @throws StorageException if existing data cannot be read safely
+     */
     Optional<FarmSnapshot> load() throws StorageException;
 
-    /** Saves the complete current farm state. */
+    /**
+     * Saves the complete farm state.
+     *
+     * @param snapshot state to persist
+     * @throws StorageException if the state cannot be written safely
+     */
     void save(FarmSnapshot snapshot) throws StorageException;
 }

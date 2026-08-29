@@ -4,7 +4,12 @@ package io.github.darzizalol.focusfarm.storage;
 public class StorageException extends Exception {
     private static final long serialVersionUID = 1L;
 
-    /** Creates a storage exception with a user-facing message and cause. */
+    /**
+     * Creates a storage exception with a user-facing message and cause.
+     *
+     * @param message explanation suitable for display
+     * @param cause underlying I/O failure
+     */
     public StorageException(String message, Throwable cause) {
         super(message, cause);
     }
