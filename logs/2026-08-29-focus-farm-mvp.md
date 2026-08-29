@@ -75,3 +75,17 @@ layout.
   the convention in `AGENTS.md` and Codex project-memory context.
 - Preserved the former MVP commit under a local backup tag so the history rewrite
   is recoverable until the new history has been reviewed.
+
+## Failed-save consistency follow-up
+
+- Confirmed a review finding that a state-changing command mutated the live farm
+  before its snapshot was saved. When storage failed, the UI could later expose
+  state that had never reached disk.
+- Added regression tests that reproduced retained command mutations, retained
+  timer transitions, and snapshot methods that unexpectedly advanced lifecycle
+  state.
+- Changed `LogicManager` to mutate an independent farm copy, save its snapshot,
+  and publish it only after persistence succeeds. A failed save now discards the
+  candidate state.
+- Made snapshots observational rather than state-changing so UI reads cannot
+  bypass the transactional refresh path.

@@ -86,9 +86,29 @@ class LogicManagerTest {
     }
 
     @Test
-    void execute_saveFailure_reportedAsFarmError() {
+    void execute_saveFailure_doesNotRetainCommandMutation() throws Exception {
         storage.failSave = true;
         assertThrows(FarmException.class, () -> logic.execute("/plant 1 cabbage 10s"));
+        assertEquals(PlotState.EMPTY, logic.snapshot().plots().get(0).state());
+
+        storage.failSave = false;
+        assertEquals(FarmEvent.PLANTED, logic.execute("/plant 1 cabbage 10s").event());
+        assertEquals(PlotState.PLANTED, logic.snapshot().plots().get(0).state());
+    }
+
+    @Test
+    void refreshGrowth_saveFailure_doesNotRetainReadyTransition() throws Exception {
+        logic.execute("/plant 1 carrot 10s");
+        logic.execute("/water 1");
+        clock.advance(Duration.ofSeconds(10));
+        storage.failSave = true;
+
+        assertThrows(FarmException.class, logic::refreshGrowth);
+        assertEquals(PlotState.GROWING, logic.snapshot().plots().get(0).state());
+
+        storage.failSave = false;
+        assertTrue(logic.refreshGrowth());
+        assertEquals(PlotState.READY, logic.snapshot().plots().get(0).state());
     }
 
     private static final class MemoryStorage implements FarmStorage {

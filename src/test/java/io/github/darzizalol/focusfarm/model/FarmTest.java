@@ -49,6 +49,17 @@ class FarmTest {
     }
 
     @Test
+    void snapshot_elapsedCrop_doesNotAdvanceLifecycle() throws Exception {
+        farm.plant(1, CropType.CARROT, Duration.ofSeconds(10));
+        farm.water(1);
+        clock.advance(Duration.ofSeconds(10));
+
+        assertEquals(PlotState.GROWING, farm.snapshot().plots().get(0).state());
+        assertTrue(farm.refreshGrowth());
+        assertEquals(PlotState.READY, farm.snapshot().plots().get(0).state());
+    }
+
+    @Test
     void invalidPlotIds_rejectedByAllOperations() {
         assertThrows(FarmException.class, () -> farm.plant(0, CropType.CORN, Duration.ofSeconds(10)));
         assertThrows(FarmException.class, () -> farm.water(7));

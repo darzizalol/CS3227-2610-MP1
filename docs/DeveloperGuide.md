@@ -46,9 +46,11 @@ font, music, or sound assets.
 changes the `Farm` through its public API and returns a `CommandResult` containing
 feedback, an optional plot ID, and a cosmetic `FarmEvent`.
 
-`LogicManager` persists successful state changes. Read-only commands do not
-cause writes. Time-driven transitions are saved only when a crop actually
-becomes ready.
+`LogicManager` applies each mutation to an independent candidate farm. It saves
+the candidate snapshot before publishing that candidate as the live farm, so a
+storage failure cannot leak an unpersisted command or timer transition into the
+UI. Read-only commands do not cause writes. Time-driven transitions are saved
+only when a crop actually becomes ready.
 
 ### Model and time
 
@@ -103,6 +105,8 @@ java -jar release/FocusFarm.jar
   unknown crops, and invalid argument counts.
 - Storage tests cover missing files, round trips, wrong schemas, corrupt JSON,
   backup creation, and parent-directory creation.
+- Logic tests inject save failures and verify that command and timer mutations
+  are discarded until persistence succeeds.
 - A manual GUI session checks the 70:30 layout, countdown refresh, animations,
   dashboard updates, resizing, restart, and the packaged JAR.
 

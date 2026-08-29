@@ -14,8 +14,8 @@ import io.github.darzizalol.focusfarm.storage.StorageException;
 public final class LogicManager {
     private final FarmStorage storage;
     private final CommandParser parser;
-    private final Farm farm;
     private final String startupMessage;
+    private Farm farm;
 
     /** Loads an existing farm or starts a recoverable empty farm. */
     public LogicManager(FarmStorage storage, Clock clock) {
@@ -39,18 +39,20 @@ public final class LogicManager {
     /** Executes one command and persists successful state changes. */
     public CommandResult execute(String input) throws FarmException {
         FarmCommand command = parser.parse(input);
-        CommandResult result = command.execute(farm);
+        Farm candidate = farm.copy();
+        CommandResult result = command.execute(candidate);
         if (result.stateChanged()) {
-            save();
+            commit(candidate);
         }
         return result;
     }
 
     /** Refreshes time-driven state and saves only when a crop becomes ready. */
     public boolean refreshGrowth() throws FarmException {
-        boolean changed = farm.refreshGrowth();
+        Farm candidate = farm.copy();
+        boolean changed = candidate.refreshGrowth();
         if (changed) {
-            save();
+            commit(candidate);
         }
         return changed;
     }
@@ -67,12 +69,17 @@ public final class LogicManager {
 
     /** Persists current state before application shutdown. */
     public void close() throws FarmException {
-        save();
+        save(farm.snapshot());
     }
 
-    private void save() throws FarmException {
+    private void commit(Farm candidate) throws FarmException {
+        save(candidate.snapshot());
+        farm = candidate;
+    }
+
+    private void save(FarmSnapshot snapshot) throws FarmException {
         try {
-            storage.save(farm.snapshot());
+            storage.save(snapshot);
         } catch (StorageException exception) {
             throw new FarmException(exception.getMessage(), exception);
         }

@@ -87,6 +87,17 @@ public final class FarmPlot {
         return false;
     }
 
+    /** Returns an independent mutable copy without advancing time-driven state. */
+    FarmPlot copy() {
+        FarmPlot copy = new FarmPlot(id);
+        copy.crop = crop;
+        copy.state = state;
+        copy.growthDuration = growthDuration;
+        copy.readyAt = readyAt;
+        copy.fertilized = fertilized;
+        return copy;
+    }
+
     /** Harvests a ready crop and resets the plot. */
     public HarvestRecord harvest(Instant now) throws FarmException {
         refresh(now);
@@ -100,10 +111,9 @@ public final class FarmPlot {
 
     /** Returns an immutable snapshot at the supplied instant. */
     public PlotSnapshot snapshot(Instant now) {
-        refresh(now);
         long remainingSeconds = 0;
         if (state == PlotState.GROWING) {
-            long remainingMillis = Duration.between(now, readyAt).toMillis();
+            long remainingMillis = Duration.between(Objects.requireNonNull(now), readyAt).toMillis();
             remainingSeconds = Math.max(1, (remainingMillis + 999) / 1000);
         }
         long growthSeconds = growthDuration == null ? 0 : growthDuration.toSeconds();

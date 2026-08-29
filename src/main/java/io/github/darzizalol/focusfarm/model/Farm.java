@@ -93,10 +93,21 @@ public final class Farm {
         return changed;
     }
 
+    /** Returns an independent mutable copy without advancing time-driven state. */
+    public Farm copy() {
+        Farm copy = new Farm(clock);
+        copy.plots.clear();
+        for (FarmPlot plot : plots) {
+            copy.plots.add(plot.copy());
+        }
+        copy.inventory.putAll(inventory);
+        copy.harvestHistory.addAll(harvestHistory);
+        return copy;
+    }
+
     /** Returns an immutable current view of the farm. */
     public FarmSnapshot snapshot() {
         Instant now = clock.instant();
-        refreshGrowth();
         List<PlotSnapshot> plotSnapshots = plots.stream().map(plot -> plot.snapshot(now)).toList();
         Map<CropType, Integer> inventorySnapshot = Collections.unmodifiableMap(new EnumMap<>(inventory));
         List<HarvestRecord> historySnapshot = List.copyOf(harvestHistory);
