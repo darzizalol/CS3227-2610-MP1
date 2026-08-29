@@ -1,0 +1,43 @@
+@startuml
+title Countdown refresh and recovery activity
+
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam shadowing false
+
+start
+:JavaFX Timeline emits a one-second tick;
+:Copy the live Farm;
+:Refresh candidate plots using Clock;
+
+if (Did any crop become ready?) then (no)
+  :Refresh the UI from the live snapshot;
+else (yes)
+  :Save the candidate snapshot;
+  if (Did the save succeed?) then (yes)
+    :Publish candidate as the live Farm;
+    :Refresh farm and dashboard views;
+    if (Was an earlier failure reported?) then (yes)
+      :Append recovery message;
+      :Clear failure flag;
+    endif
+  else (no)
+    :Keep the previous live Farm;
+    if (Is this the first consecutive failure?) then (yes)
+      :Append one error message;
+      :Set failure flag;
+    else (no)
+      :Suppress duplicate error;
+    endif
+  endif
+endif
+
+:Wait for the next Timeline tick;
+stop
+
+note right
+  The Timeline continues after a failure,
+  so the next tick retries the transition.
+end note
+
+@enduml
