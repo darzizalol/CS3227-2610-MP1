@@ -50,7 +50,7 @@ component boundaries, and then describes each component in more detail.
 | `src/test/java` | Deterministic automated tests and UI snapshot harness |
 | `src/main/resources/styles` | JavaFX styling |
 | `docs` | User, developer, and reflection documentation |
-| `release` | Runnable JAR for the platform on which it was built |
+| `release` | Runnable JAR for Windows x64, Linux x64, and macOS ARM64 |
 
 ## 3. Architecture
 
@@ -94,7 +94,9 @@ During construction, `LogicManager`:
 4. exposes a startup or recovery message for the terminal.
 
 `FocusFarmApp.start()` creates and shows `MainWindow`. The window starts one
-JavaFX `Timeline` that requests a countdown refresh every second.
+JavaFX `Timeline` that requests a countdown refresh every second. CI can launch
+the packaged application with `--smoke-test`; the production window is shown
+and then closes automatically after JavaFX has initialized.
 
 `/exit` saves before it returns a successful exit request. Only then does
 `MainWindow` schedule `Platform.exit()`. A normal window close also invokes
@@ -344,21 +346,25 @@ packaged JAR.
 
 ### 6.4 Continuous integration and release
 
-GitHub Actions runs `./gradlew clean check` and builds a platform-specific fat
-JAR on Ubuntu, Windows, and macOS. Each job uploads a separately named
-`FocusFarm-<OS>-<architecture>` artifact because JavaFX native libraries are
-platform-specific.
+GitHub Actions runs `./gradlew clean check` and builds the cross-platform fat
+JAR on Ubuntu, Windows, and macOS. Each build includes the JavaFX native
+libraries for Windows x64, Linux x64, and macOS ARM64. The matrix provides
+separate build evidence for each supported operating system.
 
 For a local release:
 
 ```bash
-./gradlew release
+./gradlew clean check release
 java -jar release/FocusFarm.jar
 ```
 
-`release` depends on `fatJar` and copies the current platform's runnable
-`FocusFarm.jar` into `release/`. A release is complete only after the quality
-gate and a manual launch of the packaged JAR succeed on the target platform.
+`release` depends on `fatJar` and copies the cross-platform `FocusFarm.jar` into
+`release/`. It also runs `verifyUniversalJar`, which checks for the native Glass
+runtime and application class for every supported operating system. CI then
+launches that JAR with `--smoke-test` on Windows, Linux, and macOS. Linux uses
+`xvfb-run` to provide a virtual display, and every smoke-test step has a bounded
+timeout. A release is complete only after the quality gate and packaged-JAR
+smoke test succeed on every supported platform.
 
 ## 7. Acknowledgements
 

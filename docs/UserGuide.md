@@ -13,10 +13,10 @@ is ready.
 - Windows, Linux, or macOS
 - A display resolution of at least 980 × 650
 
-The packaged JAR contains JavaFX native libraries for one platform. Use a JAR
-built for your operating system and CPU architecture. The JAR checked into this
-repository is built for macOS on Apple Silicon; the project's CI produces
-separate Windows, Linux, and macOS artifacts.
+The packaged JAR contains JavaFX native libraries for Windows x64, Linux x64,
+and macOS on Apple Silicon. The same `FocusFarm.jar` can run on any of those
+platforms when Java 25 is installed. Other CPU architectures require a release
+built specifically for that architecture.
 
 ### Run the packaged application
 
@@ -209,7 +209,7 @@ be created, the terminal says so.
 ### The application does not start
 
 1. Run `java -version` and check that it reports Java 25.
-2. Confirm that the JAR matches your operating system and CPU architecture.
+2. Confirm that the JAR supports your operating system and CPU architecture.
 3. If using the source checkout, run the platform-appropriate Gradle command
    from the repository root.
 
@@ -222,8 +222,8 @@ current plot states.
 ### Start a separate test farm
 
 Farm data belongs to the folder from which the application is started. To
-avoid changing an existing farm, copy the correct platform JAR into a new empty
-folder and run it there. That folder receives its own `data/farm.json`.
+avoid changing an existing farm, copy the JAR into a new empty folder and run
+it there. That folder receives its own `data/farm.json`.
 
 ## Current limitations
 
