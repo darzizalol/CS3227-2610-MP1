@@ -31,23 +31,23 @@ jobs:
       - name: Run quality gate
         run: ./gradlew clean check
 
-      - name: Build and verify cross-platform JAR
-        run: ./gradlew verifyUniversalJar
+      - name: Build and verify release JAR
+        run: ./gradlew release
 
       - name: Smoke-test packaged JAR on Linux
         if: runner.os == 'Linux'
         timeout-minutes: 2
         working-directory: ${{ runner.temp }}
-        run: xvfb-run -a java -jar "${{ github.workspace }}/build/libs/FocusFarm.jar" --smoke-test
+        run: xvfb-run -a java -jar "${{ github.workspace }}/release/FocusFarm.jar" --smoke-test
 
       - name: Smoke-test packaged JAR on Windows and macOS
         if: runner.os != 'Linux'
         timeout-minutes: 2
         working-directory: ${{ runner.temp }}
-        run: java -jar "${{ github.workspace }}/build/libs/FocusFarm.jar" --smoke-test
+        run: java -jar "${{ github.workspace }}/release/FocusFarm.jar" --smoke-test
 
       - name: Upload cross-platform JAR
         uses: actions/upload-artifact@v4
         with:
           name: FocusFarm-${{ runner.os }}-${{ runner.arch }}
-          path: build/libs/FocusFarm.jar
+          path: release/FocusFarm.jar
