@@ -102,6 +102,32 @@ This is exactly where prompting hits a wall compared to manual engineering. AI r
 
 For future reviews, I’ll prompt the AI to generate a reproducible test case alongside every finding. That forces it to prove the bug exists, makes the reasoning easier to verify, and turns a vague review comment into a concrete regression test *before* any code gets touched.
 
+## Example 6: Separating build success from runtime compatibility
+
+### What went wrong
+
+The JAR checked into `release/` appeared to fail on Windows even though the
+Windows CI job was green. Inspecting the archive showed that it contained only
+macOS Apple Silicon JavaFX classes and native libraries. CI had proved that the
+project could build on Windows, but it had not proved that the checked-in JAR
+could run there.
+
+### How I refined the release
+
+I asked the AI to verify the binary contents before proposing a fix. After
+confirming the platform mismatch, I chose a single cross-platform fat JAR for
+the supported Windows x64, Linux x64, and macOS ARM64 targets. The build now
+checks that each platform's JavaFX Glass runtime is present before copying the
+JAR into `release/`.
+
+### What I learnt
+
+Passing source tests and compiling on several operating systems do not verify a
+specific release artifact. Native dependencies must be inspected and the final
+packaged file must be launched on every target platform. I added a bounded
+packaged-JAR smoke mode to CI so each runner now proves that the real JavaFX
+application can initialize and show its window.
+
 ## Overall reflection
 
 The biggest ROI of using AI was pure velocity: it rapidly accelerated moving from rough idea to structured plan, generating boilerplate, reviewing a bulky codebase, and formatting docs. The main limitation is that it requires explicit, constant guardrails around SWE processes and documentation standards.

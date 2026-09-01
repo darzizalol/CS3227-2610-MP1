@@ -27,6 +27,11 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.22.2'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.22.2'
 
+    // Include the JavaFX native runtime for every supported release platform.
+    runtimeOnly 'org.openjfx:javafx-graphics:25.0.4:win'
+    runtimeOnly 'org.openjfx:javafx-graphics:25.0.4:linux'
+    runtimeOnly 'org.openjfx:javafx-graphics:25.0.4:mac-aarch64'
+
     testImplementation platform('org.junit:junit-bom:5.14.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -100,7 +105,7 @@ tasks.named('check') {
 
 tasks.register('fatJar', Jar) {
     group = 'build'
-    description = 'Builds a runnable JAR containing the current platform JavaFX runtime.'
+    description = 'Builds a runnable JAR for Windows x64, Linux x64, and macOS ARM64.'
     archiveFileName = 'FocusFarm.jar'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
@@ -118,10 +123,34 @@ tasks.register('fatJar', Jar) {
     }
 }
 
+tasks.register('verifyUniversalJar') {
+    group = 'verification'
+    description = 'Verifies that the fat JAR contains every supported JavaFX runtime.'
+    dependsOn tasks.named('fatJar')
+
+    doLast {
+        def jarFile = tasks.named('fatJar').get().archiveFile.get().asFile
+        def requiredEntries = [
+                'glass.dll',
+                'libglass.so',
+                'libglass.dylib',
+                'com/sun/glass/ui/win/WinApplication.class',
+                'com/sun/glass/ui/gtk/GtkApplication.class',
+                'com/sun/glass/ui/mac/MacApplication.class'
+        ]
+
+        requiredEntries.each { requiredEntry ->
+            if (zipTree(jarFile).matching { include requiredEntry }.isEmpty()) {
+                throw new GradleException("Universal JAR is missing ${requiredEntry}")
+            }
+        }
+    }
+}
+
 tasks.register('release', Copy) {
     group = 'distribution'
     description = 'Copies the runnable JAR into release/.'
-    dependsOn tasks.named('fatJar')
+    dependsOn tasks.named('verifyUniversalJar')
     from tasks.named('fatJar').flatMap { it.archiveFile }
     into layout.projectDirectory.dir('release')
 }
